@@ -1,0 +1,73 @@
+{
+  "_comment": "Edit this file to steer the capture run. 'themes' are the research objectives; theme_keywords power the auto-suggested tagging in the manifest (you still confirm/override by hand). Reddit and forum threads are DISCOVERED at runtime from search terms; Trustpilot brands are captured directly. Facebook is intentionally skip-listed.",
+
+  "themes": {
+    "1": "Price primacy / renewal price jumps / loyalty penalty",
+    "2": "Claims experience as the trust-breaker and switch trigger",
+    "3": "NCD and NCD-protection anxiety",
+    "4": "Workshop panel vs 'any workshop' rider",
+    "5": "Windscreen/sunroof and other add-ons people look out for",
+    "6": "Usage-based / 'drive less save more'",
+    "7": "Brand mindshare - mention or absence of UOI / UniCar"
+  },
+
+  "theme_keywords": {
+    "1": ["price", "cheaper", "cheapest", "premium", "expensive", "jump", "increase", "renewal", "renew", "loyalty", "quote", "quotation", "cost", "hike"],
+    "2": ["claim", "claims", "accident", "workshop rejected", "reject", "payout", "surveyor", "adjuster", "hassle", "denied", "settle"],
+    "3": ["ncd", "no claim discount", "no-claim", "ncd protect", "ncd reset", "50%", "protected ncd"],
+    "4": ["panel workshop", "any workshop", "authorised workshop", "authorized workshop", "own workshop", "reporting centre", "approved workshop"],
+    "5": ["windscreen", "windshield", "sunroof", "add-on", "addon", "rider", "excess", "buyback", "personal accident", "loss of use"],
+    "6": ["usage based", "usage-based", "drive less", "mileage", "pay per", "pay-per", "telematics", "low mileage"],
+    "7": ["uoi", "united overseas insurance", "unicar", "uni car"]
+  },
+
+  "brands_of_interest": ["etiqa", "fwd", "budget direct", "direct asia", "income", "ntuc income", "aviva", "singlife", "uoi", "united overseas insurance", "unicar", "msig", "sompo", "hlas", "hong leong", "liberty", "aig", "ecics"],
+
+  "reddit": {
+    "enabled": true,
+    "subreddits": ["singapore", "askSingapore", "singaporefi"],
+    "terms": ["car insurance", "renew car insurance", "NCD", "Direct Asia", "FWD", "Etiqa", "claim experience", "switch insurer"],
+    "sort": "relevance",
+    "time": "all",
+    "min_score": 3,
+    "max_per_source": 6,
+    "render_host": "old.reddit.com"
+  },
+
+  "hardwarezone": {
+    "enabled": true,
+    "note": "In-forum search often requires a logged-in account; if the search page returns a login/guest wall the run records it as 'blocked' and moves on. Public thread URLs, once known, render fine.",
+    "search_url_template": "https://forums.hardwarezone.com.sg/search/?q={term}&o=relevance",
+    "subforum_hints": ["Money Mind", "Motoring", "Cars"],
+    "terms": ["car insurance", "renew car insurance", "NCD", "Direct Asia", "FWD", "Etiqa", "claim experience", "switch insurer"],
+    "max_per_source": 5,
+    "seed_thread_urls": []
+  },
+
+  "trustpilot": {
+    "enabled": true,
+    "review_pages": [
+      {"brand": "Etiqa",        "url": "https://www.trustpilot.com/review/www.etiqa.com.sg"},
+      {"brand": "FWD",          "url": "https://www.trustpilot.com/review/www.fwd.com.sg"},
+      {"brand": "Budget Direct","url": "https://www.trustpilot.com/review/www.budgetdirect.com.sg"},
+      {"brand": "Direct Asia",  "url": "https://www.trustpilot.com/review/www.directasia.com"},
+      {"brand": "Income",       "url": "https://www.trustpilot.com/review/www.income.com.sg"}
+    ],
+    "reviews_to_crop": 4,
+    "note": "URLs are best-guess Trustpilot slugs; if a brand's SG page lives under a different slug the run records 404/blocked and you can correct the url here."
+  },
+
+  "lowyat": {
+    "enabled": true,
+    "priority": "low",
+    "search_url_template": "https://forum.lowyat.net/index.php?act=Search&CODE=01&keywords={term}",
+    "terms": ["car insurance", "NCD", "renew car insurance"],
+    "max_per_source": 3,
+    "seed_thread_urls": []
+  },
+
+  "facebook": {
+    "enabled": false,
+    "reason": "Login-gated. Not captured automatically. See README 'Facebook (manual)' for exactly what to capture by hand, or point the tool at a persistent logged-in Chromium profile via --fb-profile."
+  }
+}
