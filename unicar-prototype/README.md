@@ -7,6 +7,7 @@ No component library; behaviour is plain React state.
 ```bash
 npm install
 npm run dev
+npm run build:preview   # one self-contained dist-preview/index.html for sharing
 ```
 
 ## Flow
@@ -20,7 +21,7 @@ npm run dev
 | 6 | `8543:25868` | Open the registration dropdown. |
 | 7 | `8543:26182` | Pick **SKC5500A**: make, power and year fill in and lock; fill the rest. |
 
-## Assets (`public/assets/`)
+## Assets (`src/assets/`)
 - Icons and the "Retrieve with Singpass" button are exported from the Figma nodes as-is.
 - Supplied by the design team: `logo.svg` (UOI logo), `singpass-logo.svg`, `consent-list.svg` (the whole white
   list panel of the consent screen), and `hero.jpg` (the photo from `unicar.svg`).
