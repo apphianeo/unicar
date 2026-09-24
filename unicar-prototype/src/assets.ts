@@ -1,28 +1,50 @@
 // Icons are exported from the Figma nodes; logo, hero photo, Singpass logo and consent list were supplied by the design team.
-const a = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
+import logo from "./assets/logo.svg";
+import hero from "./assets/hero.jpg";
+import singpassLogo from "./assets/singpass-logo.svg";
+import consentList from "./assets/consent-list.svg";
+import retrieveWithSingpass from "./assets/retrieve-with-singpass.svg";
+import questionMark from "./assets/question-mark.svg";
+import icDown from "./assets/ic-down.svg";
+import icDownDisabled from "./assets/ic-down-disabled.svg";
+import icDownTertiary from "./assets/ic-down-tertiary.svg";
+import icUp from "./assets/ic-up.svg";
+import icTick from "./assets/ic-tick.svg";
+import info from "./assets/info.svg";
+import infoAlert from "./assets/info-alert.svg";
+import calendar from "./assets/calendar.svg";
+import radioSelected from "./assets/radio-selected.svg";
+import discount from "./assets/discount.svg";
+import icClose from "./assets/ic-close.svg";
+import icPlus from "./assets/ic-plus.svg";
+import line111 from "./assets/line-111.svg";
+import popoverArrow from "./assets/popover-arrow.svg";
+import chevronLeft from "./assets/chevron-left.svg";
+import chevronRight from "./assets/chevron-right.svg";
+import sortDown from "./assets/sort-down.svg";
 
 export const assets = {
-  logo: a("logo.svg"),
-  hero: a("hero.jpg"),
-  singpassLogo: a("singpass-logo.svg"),
-  consentList: a("consent-list.svg"),
-  retrieveWithSingpass: a("retrieve-with-singpass.svg"),
-  questionMark: a("question-mark.svg"),
-  icDown: a("ic-down.svg"),
-  icDownDisabled: a("ic-down-disabled.svg"),
-  icDownTertiary: a("ic-down-tertiary.svg"),
-  icUp: a("ic-up.svg"),
-  icTick: a("ic-tick.svg"),
-  info: a("info.svg"),
-  infoAlert: a("info-alert.svg"),
-  calendar: a("calendar.svg"),
-  radioSelected: a("radio-selected.svg"),
-  discount: a("discount.svg"),
-  icClose: a("ic-close.svg"),
-  icPlus: a("ic-plus.svg"),
-  line111: a("line-111.svg"),
-  popoverArrow: a("popover-arrow.svg"),
-  chevronLeft: a("chevron-left.svg"),
-  chevronRight: a("chevron-right.svg"),
-  sortDown: a("sort-down.svg"),
+  logo,
+  hero,
+  singpassLogo,
+  consentList,
+  retrieveWithSingpass,
+  questionMark,
+  icDown,
+  icDownDisabled,
+  icDownTertiary,
+  icUp,
+  icTick,
+  info,
+  infoAlert,
+  calendar,
+  radioSelected,
+  discount,
+  icClose,
+  icPlus,
+  line111,
+  popoverArrow,
+  chevronLeft,
+  chevronRight,
+  sortDown,
 };
