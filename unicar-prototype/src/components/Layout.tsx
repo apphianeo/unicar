@@ -1,46 +1,52 @@
-import type { ReactNode } from "react";
-import { HeroImage, QuestionIcon, UoiLogo } from "../assets";
-import { copy } from "../data/mock";
+import { assets } from "../assets";
 
-// Header + hero banner + footer shared by every "Get quote" frame.
-export default function Layout({ children }: { children: ReactNode }) {
+// Header (8383:5192)
+export function Header() {
   return (
-    <div className="min-h-screen flex flex-col bg-bg-page">
-      <header className="bg-white px-6 py-3 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.09)]">
-        <div className="flex items-center justify-between">
-          <div className="w-[124px]">
-            <UoiLogo />
-          </div>
-          <button className="flex items-center gap-1 h-8 bg-transparent border-0 p-0 cursor-pointer">
-            <QuestionIcon />
-            <span className="text-[12px] font-medium leading-[1.4] text-text-tertiary">Need Assistance?</span>
-          </button>
+    <header className="relative flex w-full flex-col items-center bg-bg-white px-[24px] py-[12px] shadow-underline">
+      <div className="flex w-full items-center justify-between">
+        <div className="flex h-[30px] w-[124px] flex-col items-start">
+          <img src={assets.logo} alt="UOI" className="h-[30px] w-[60px] object-contain" />
         </div>
-      </header>
-
-      <main className="relative flex-1 flex flex-col items-center px-6 py-[52px] overflow-hidden">
-        <HeroImage />
-        <div className="relative w-full max-w-[1000px] flex flex-col gap-8">
-          <div className="flex flex-col gap-4">
-            <span
-              className="self-start rounded-[24px] px-2 py-1 text-[12px] font-medium leading-[1.4] text-white"
-              style={{ background: "linear-gradient(to right, #005eb8 0.6%, #5c55eb)" }}
-            >
-              {copy.badge}
-            </span>
-            <div className="flex flex-col gap-3 text-white">
-              <h1 className="m-0 text-[32px] font-semibold leading-[1.2]">{copy.title}</h1>
-              <p className="text-[16px] font-medium leading-[1.5]">{copy.subtitle}</p>
-            </div>
-          </div>
-          {children}
+        {/* Need Assistance? has no destination in the design, so it is inert. */}
+        <div className="flex h-[32px] items-center gap-[4px]">
+          <img src={assets.questionMark} alt="" width={20} height={20} className="size-[20px]" />
+          <p className="whitespace-nowrap text-center text-[12px] font-medium leading-[1.4] text-text-tertiary">
+            Need Assistance?
+          </p>
         </div>
-      </main>
+      </div>
+    </header>
+  );
+}
 
-      <footer className="bg-primary px-6 py-4 flex items-center justify-between text-[14px] leading-[1.5] text-white">
-        <p>{copy.footerLeft}</p>
-        <p>{copy.footerRight}</p>
-      </footer>
+// Footer Short (1310:25309)
+export function FooterShort() {
+  return (
+    <footer className="flex w-full items-center justify-between whitespace-nowrap bg-primary-sureblue px-[24px] py-[16px] text-[14px] font-normal leading-[1.5] text-white">
+      <p>Copyright © 2026 United Overseas Insurance Limited Co. Reg. No. 197100152R.</p>
+      <p className="text-right">All Rights Reserved.</p>
+    </footer>
+  );
+}
+
+// Landing Banner (8383:5202)
+export function LandingBanner() {
+  return (
+    <div className="flex w-full flex-col items-start gap-[16px]">
+      <div className="flex items-center justify-center gap-[4px] rounded-[24px] bg-gradient-to-r from-[#005eb8] from-[0.618%] to-[#5c55eb] px-[8px] py-[4px]">
+        <p className="whitespace-nowrap text-center text-[12px] font-medium leading-[1.4] text-white">
+          🎉 60% off auto-applied! | Promo ends 31 May
+        </p>
+      </div>
+      <div className="flex w-full flex-col items-start gap-[12px]">
+        <p className="whitespace-nowrap text-[32px] font-semibold leading-[1.2] text-white">
+          Ready to protect your rides with UniCar?
+        </p>
+        <p className="w-full text-[16px] font-medium leading-[1.5] text-white">
+          Travel with peace of mind with UOI, trusted protection with millions paid in claims
+        </p>
+      </div>
     </div>
   );
 }

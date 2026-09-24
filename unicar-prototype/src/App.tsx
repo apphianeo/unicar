@@ -1,82 +1,45 @@
 import { useState } from "react";
-import Layout from "./components/Layout";
-import MyinfoCard from "./components/MyinfoCard";
-import QuoteForm, { type FormMode, type FormState } from "./screens/QuoteForm";
+import QuoteForm, { type Policy, type QuoteStep } from "./screens/QuoteForm";
 import SingpassConsent from "./screens/SingpassConsent";
-import { singpassVehicles } from "./data/mock";
 
-// Flow (user's order):
-// 1 quote (empty) → 2 Singpass consent → 3 filled (1 vehicle) → 4 user fills policy fields
-// → Check Price → 5 multi (3 vehicles found) → 6 open reg dropdown → 7 pick car, fill blanks.
-type Step = "quote" | "consent" | "filled" | "multi";
-
-const initialForm: FormState = {
-  offPeak: "no",
-  driveAtWork: "no",
-  promoApplied: true,
-  promoInput: "",
-};
-
-const firstVehicle = singpassVehicles[0];
+const emptyPolicy: Policy = { startDate: "", endDate: "", driveAtWork: "No" };
 
 export default function App() {
-  const [step, setStep] = useState<Step>("quote");
-  const [form, setFormState] = useState<FormState>(initialForm);
-  const [vehicleLocked, setVehicleLocked] = useState(false);
-  const setForm = (patch: Partial<FormState>) => setFormState((f) => ({ ...f, ...patch }));
-
-  const reset = () => {
-    setFormState(initialForm);
-    setVehicleLocked(false);
-    setStep("quote");
-  };
+  const [step, setStep] = useState<QuoteStep | "consent">("quote");
+  const [regNo, setRegNo] = useState<string>();
+  const [vehicleConfirmed, setVehicleConfirmed] = useState(false);
+  const [offPeak, setOffPeak] = useState<"Yes" | "No">("No");
+  const [power, setPower] = useState("");
+  const [policy, setPolicy] = useState<Policy>(emptyPolicy);
 
   if (step === "consent") {
-    return (
-      <SingpassConsent
-        onCancel={() => setStep("quote")}
-        onAgree={() => {
-          const { reg, make, power, year } = firstVehicle;
-          setFormState({ ...initialForm, reg, make, power, year });
-          setVehicleLocked(true);
-          setStep("filled");
-          window.scrollTo(0, 0);
-        }}
-      />
-    );
+    return <SingpassConsent onCancel={() => setStep("quote")} onAgree={() => setStep("filled")} />;
   }
 
-  const mode: FormMode = step === "quote" ? "empty" : step;
-
   return (
-    <Layout>
-      <div className="flex flex-col gap-6">
-        {step === "multi" ? (
-          <MyinfoCard variant="clear" onClear={reset} />
-        ) : (
-          <MyinfoCard variant="retrieve" onRetrieve={() => setStep("consent")} />
-        )}
-        <QuoteForm
-          mode={mode}
-          form={form}
-          setForm={setForm}
-          vehicleLocked={vehicleLocked}
-          onSelectVehicle={(reg) => {
-            const v = singpassVehicles.find((x) => x.reg === reg);
-            setForm({ reg, make: v?.make, power: v?.power, year: v?.year });
-            // Lock only when Singpass returned details for this vehicle (as in frame 8543:26182).
-            setVehicleLocked(!!v?.make);
-          }}
-          onCheckPrice={() => {
-            if (step !== "filled") return;
-            // Frame 8543:25408: 3 vehicles found, SKC5500A shown, other fields empty.
-            setFormState({ ...initialForm, reg: firstVehicle.reg });
-            setVehicleLocked(false);
-            setStep("multi");
-            window.scrollTo(0, 0);
-          }}
-        />
-      </div>
-    </Layout>
+    <QuoteForm
+      step={step}
+      regNo={regNo}
+      vehicleConfirmed={vehicleConfirmed}
+      offPeak={offPeak}
+      power={power}
+      policy={policy}
+      onRetrieve={() => setStep("consent")}
+      onCheckPrice={() => {
+        // 8543:25408: SKC5500A preselected, other fields empty, info alert shown.
+        setRegNo("SKC5500A");
+        setVehicleConfirmed(false);
+        setPower("");
+        setPolicy(emptyPolicy);
+        setStep("found");
+      }}
+      onPickVehicle={(r) => {
+        setRegNo(r);
+        setVehicleConfirmed(true);
+      }}
+      onOffPeak={setOffPeak}
+      onPower={setPower}
+      onPolicy={(p) => setPolicy((prev) => ({ ...prev, ...p }))}
+    />
   );
 }

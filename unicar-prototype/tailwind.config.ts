@@ -1,23 +1,38 @@
 import type { Config } from "tailwindcss";
 
+// Colours, type and effects are the UOI Design System variables used in the Figma frames.
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
-  corePlugins: { preflight: false },
   theme: {
     extend: {
       colors: {
-        primary: "var(--color-primary)",
-        "text-primary": "var(--color-text-primary)",
-        "text-secondary": "var(--color-text-secondary)",
-        "text-tertiary": "var(--color-text-tertiary)",
-        "text-disabled": "var(--color-text-disabled)",
-        "bg-page": "var(--color-bg-whitewashed)",
-        "bg-disabled": "var(--color-bg-disabled)",
-        "bg-info": "var(--color-bg-info)",
-        success: "var(--color-success)",
-        line: "var(--color-line)",
+        "primary-sureblue": "var(--primary-color-primary-sureblue)",
+        "text-primary": "var(--type-color-text-primary)",
+        "text-secondary": "var(--type-color-text-secondary)",
+        "text-tertiary": "var(--type-color-text-tertiary)",
+        "text-disabled": "var(--type-color-text-disabled)",
+        "bg-white": "var(--background-color-bg-white)",
+        "bg-whitewashed": "var(--background-color-bg-whitewashed)",
+        "disabled-bg": "var(--status-color-disabled-bg)",
+        "status-info": "var(--status-color-status-info)",
+        "statusbg-info": "var(--status-color-statusbg-info)",
+        "status-success": "var(--status-color-status-success)",
+        line: "var(--utility-color-line)",
       },
-      fontFamily: { sans: ['"Noto Sans"', "sans-serif"] },
+      fontFamily: {
+        sans: ['"Noto Sans"', "sans-serif"],
+        inter: ['"Inter"', "sans-serif"],
+      },
+      dropShadow: {
+        // effect-overlay: DROP_SHADOW #0000000D, y 1, radius 4
+        overlay: "0px 1px 2px rgba(0,0,0,0.05)",
+        // Popover effect-overlay: DROP_SHADOW #0000001F, radius 9
+        popover: "0px 0px 4.5px rgba(0,0,0,0.12)",
+      },
+      boxShadow: {
+        // effect-underline: INNER_SHADOW #00000017, y -1
+        underline: "inset 0px -1px 0px 0px rgba(0,0,0,0.09)",
+      },
     },
   },
 } satisfies Config;
