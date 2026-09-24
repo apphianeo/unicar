@@ -21,15 +21,8 @@ export default function SingpassConsent({ onCancel, onAgree }: { onCancel: () =>
               </div>
             </div>
           </div>
-          <div className="flex w-full flex-col items-center justify-center rounded-bl-[9.722px] rounded-br-[9.722px] bg-bg-white p-[25.926px]">
-            <div className="relative aspect-[836/688] w-full overflow-hidden">
-              <img
-                src={assets.consentList}
-                alt=""
-                className="absolute left-[-36.12%] top-[-52.04%] h-[184.76%] w-[172.25%] max-w-none"
-              />
-            </div>
-          </div>
+          {/* Frame 2053140958: white panel with the consent list, supplied as one SVG. */}
+          <img src={assets.consentList} alt="" width={636} height={533} className="block h-[532.586px] w-full" />
         </div>
         <p className="whitespace-nowrap font-inter text-[12.963px] font-normal not-italic leading-normal text-text-secondary">
           Clicking the “I Agree” button permits the digital service to retrieve your data based on the

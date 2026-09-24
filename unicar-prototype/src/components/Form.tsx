@@ -195,33 +195,175 @@ function maskDate(raw: string) {
   return [d.slice(0, 2), d.slice(2, 4), d.slice(4, 8)].filter(Boolean).join("/");
 }
 
-// Date Picker (1276:2604 empty, 1276:2736 filled). Typed DD/MM/YYYY; no calendar popup is designed.
+function parseDate(v: string) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
+  if (!m) return undefined;
+  const d = new Date(+m[3], +m[2] - 1, +m[1]);
+  return d.getMonth() === +m[2] - 1 ? d : undefined;
+}
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const formatDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+const sameDay = (a?: Date, b?: Date) => !!a && !!b && a.toDateString() === b.toDateString();
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const dayText = "whitespace-nowrap text-center text-[14px] font-medium leading-[28px] tracking-[-0.5px] [font-feature-settings:'salt'_1]";
+
+// "Calender" inside Date Picker, state=expanded (UOI DS 1276:2631 start-date, 1276:2809 end-date)
+function Calendar({
+  selected,
+  rangeStart,
+  onPick,
+}: {
+  selected?: Date;
+  // End-date type: highlights the range from the start date to the selected date.
+  rangeStart?: Date;
+  onPick: (d: Date) => void;
+}) {
+  const initial = selected ?? rangeStart ?? new Date();
+  const [month, setMonth] = useState(new Date(initial.getFullYear(), initial.getMonth(), 1));
+  const selectedTime = selected?.getTime();
+  useEffect(() => {
+    if (selected) setMonth(new Date(selected.getFullYear(), selected.getMonth(), 1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTime]);
+  const firstDay = month.getDay();
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const cells: (Date | undefined)[] = [
+    ...Array.from({ length: firstDay }, () => undefined),
+    ...Array.from({ length: daysInMonth }, (_, i) => new Date(month.getFullYear(), month.getMonth(), i + 1)),
+  ];
+  while (cells.length < 42) cells.push(undefined);
+  const weeks = Array.from({ length: 6 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+  const inRange = (d: Date) => !!rangeStart && !!selected && d >= rangeStart && d <= selected && rangeStart < selected;
+  const shift = (n: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + n, 1));
+  const header = "whitespace-nowrap text-center text-[18px] font-bold capitalize leading-[28px] text-white [font-feature-settings:'salt'_1]";
+
+  return (
+    <div className="flex h-[267px] w-full flex-col items-start bg-bg-white">
+      <div className="flex h-[48px] w-full items-center justify-between rounded-tl-[10px] rounded-tr-[10px] bg-primary-sureblue p-[20px]">
+        <button type="button" onClick={() => shift(-1)} className="h-[24px] w-[15px] shrink-0 cursor-pointer">
+          <img src={assets.chevronLeft} alt="Previous month" width={15} height={24} />
+        </button>
+        {/* The month and year carets have no designed menu, so they are labels only. */}
+        <div className="flex items-center gap-[5px]">
+          <p className={header}>{MONTHS[month.getMonth()]}</p>
+          <img src={assets.sortDown} alt="" width={12} height={12} className="size-[12px]" />
+        </div>
+        <div className="flex items-center gap-[5px]">
+          <p className={header}>{month.getFullYear()}</p>
+          <img src={assets.sortDown} alt="" width={12} height={12} className="size-[12px]" />
+        </div>
+        <button type="button" onClick={() => shift(1)} className="h-[21px] w-[12px] shrink-0 cursor-pointer">
+          <img src={assets.chevronRight} alt="Next month" width={12} height={21} />
+        </button>
+      </div>
+      <div className="flex h-[219px] w-full flex-col items-center rounded-bl-[10px] rounded-br-[10px] border border-solid border-[rgba(0,0,0,0.08)] p-[10px]">
+        <div className="flex min-h-px w-full flex-[1_0_0] items-start">
+          {WEEKDAYS.map((w) => (
+            <div key={w} className="flex min-w-px flex-[1_0_0] items-center justify-center rounded-[4px] pt-[2px]">
+              <p className="whitespace-nowrap text-center text-[14px] font-bold leading-[28px] tracking-[-1px] text-text-secondary [font-feature-settings:'salt'_1]">
+                {w}
+              </p>
+            </div>
+          ))}
+        </div>
+        {weeks.map((week, wi) => (
+          <div key={wi} className="flex min-h-px w-full flex-[1_0_0] items-center justify-center">
+            {week.map((d, di) => {
+              if (!d) return <div key={di} className="min-w-px flex-[1_0_0]" />;
+              const isSel = sameDay(d, selected) || sameDay(d, rangeStart);
+              const band = inRange(d);
+              const bandShape = `${sameDay(d, rangeStart) ? "rounded-l-[24px]" : ""} ${sameDay(d, selected) ? "rounded-r-[24px]" : ""}`;
+              return (
+                <button
+                  key={di}
+                  type="button"
+                  onClick={() => onPick(d)}
+                  className={`flex h-[30px] min-w-px flex-[1_0_0] cursor-pointer items-center justify-center ${band ? `bg-[rgba(0,94,184,0.2)] ${bandShape}` : ""}`}
+                >
+                  {isSel ? (
+                    <span className="flex size-[30px] items-center justify-center rounded-[40px] bg-primary-sureblue">
+                      <span className={`${dayText} text-white`}>{pad(d.getDate())}</span>
+                    </span>
+                  ) : (
+                    <span className={`${dayText} text-text-primary`}>{pad(d.getDate())}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Date Picker (collapsed 1276:2604, filled 1276:2736, expanded 1276:3259 / 1276:3256).
+// Typing DD/MM/YYYY works too; the calendar opens on focus.
 export function DateField({
   label,
   info,
   tooltip,
   value,
+  rangeStart,
   onChange,
 }: {
   label: string;
   info?: boolean;
   tooltip?: string;
   value: string;
+  // For the end-date picker: the chosen start date, shown as the start of the range.
+  rangeStart?: string;
   onChange: (v: string) => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [open]);
+
+  const field = open
+    ? "flex h-[54px] w-full items-center gap-[8px] rounded-[8px] border-[3px] border-solid border-[rgba(0,94,184,0.2)]"
+    : "";
+
   return (
-    <div className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
+    <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
       <InputHeader label={label} info={info} tooltip={tooltip} />
-      <div className={`${fieldBox} bg-bg-white ${focusRing}`}>
-        <input
-          value={value}
-          inputMode="numeric"
-          placeholder="DD/MM/YYYY"
-          onChange={(e) => onChange(maskDate(e.target.value))}
-          className={`min-w-px flex-[1_0_0] bg-transparent text-text-primary outline-none placeholder:text-text-tertiary ${bodyText}`}
-        />
-        <img src={assets.calendar} alt="" width={24} height={24} className="size-[24px] shrink-0" />
+      <div className={open ? `${field} -m-[3px] w-[calc(100%+6px)]` : "w-full"}>
+        <div
+          className={`${fieldBox} bg-bg-white ${open ? "border-primary-sureblue" : ""}`}
+          onClick={() => setOpen(true)}
+        >
+          <input
+            value={value}
+            inputMode="numeric"
+            placeholder="DD/MM/YYYY"
+            onFocus={() => setOpen(true)}
+            onChange={(e) => onChange(maskDate(e.target.value))}
+            className={`min-w-px flex-[1_0_0] bg-transparent text-text-primary outline-none placeholder:text-text-tertiary ${bodyText}`}
+          />
+          <img src={assets.calendar} alt="" width={24} height={24} className="size-[24px] shrink-0" />
+        </div>
       </div>
+      {open && (
+        <div className="absolute left-0 top-[calc(100%+8px)] z-10 w-full">
+          <Calendar
+            selected={parseDate(value)}
+            rangeStart={rangeStart ? parseDate(rangeStart) : undefined}
+            onPick={(d) => {
+              onChange(formatDate(d));
+              setOpen(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

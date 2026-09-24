@@ -21,19 +21,19 @@ npm run dev
 | 7 | `8543:26182` | Pick **SKC5500A**: make, power and year fill in and lock; fill the rest. |
 
 ## Assets (`public/assets/`)
-The SVGs were exported from the Figma nodes as-is. The four raster images still need to be exported and dropped in
-with these file names (the build works without them, but they show as broken images):
+- Icons and the "Retrieve with Singpass" button are exported from the Figma nodes as-is.
+- Supplied by the design team: `logo.svg` (UOI logo), `singpass-logo.svg`, `consent-list.svg` (the whole white
+  list panel of the consent screen), and `hero.jpg` (the photo from `unicar.svg`).
+- The Figma header fill (`8383:5200`, image `8bb609…`) is a composite: the photo darkened and fading into the page
+  background. Until that export arrives, the raw photo is used.
 
-| File | Figma node | Size in design |
-|---|---|---|
-| `logo.png` | `8383:5196` Logo (300×150 source, FIT) | 60×30 |
-| `hero.png` | `8383:5200` Header fill (720×758 source) | full width × 1516 |
-| `singpass-logo.png` | `8387:7686` image 242 (640×111 source) | 182.238×31.607 |
-| `consent-list.png` | `8387:7699` image 252 (1731×1528 source, cropped) | 584×481 |
+## Date picker
+Uses the UOI DS Date Picker "expanded" variants (start-date `1276:3259`, end-date `1276:3256`): it opens on focus,
+the arrows change the month, and picking a day fills `DD/MM/YYYY`. The end-date calendar shows the range from the start date.
+The month and year carets have no designed menu, so they are labels only.
 
 ## Not in the design, so left inert or empty
 - *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, *Clear Form*, promo *Apply* and its ✕, and *Check Price* after step 5.
 - SGT5899C and SVT02934G are listed but cannot be picked, because no details for them are designed.
 - The vehicle dropdowns on the first screen have no options, since none are designed.
-- Dates are typed `DD/MM/YYYY` fields; there is no calendar popup.
 - Text inputs use the Dropdown "focused" look (blue border with a 3px ring) when focused.

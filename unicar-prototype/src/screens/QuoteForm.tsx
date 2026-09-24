@@ -60,12 +60,8 @@ export default function QuoteForm(props: Props) {
     <div className="flex min-h-screen w-full flex-col items-center bg-bg-whitewashed">
       <Header />
       <section className="relative flex w-full flex-[1_0_auto] flex-col items-center overflow-hidden px-[24px] py-[52px]">
-        {/* Hero image: 720×758 @2x fill cropped to the frame width, as in the Figma header fill. */}
-        <img
-          src={assets.hero}
-          alt=""
-          className={`pointer-events-none absolute left-0 w-full max-w-none ${step === "quote" ? "top-[-84.67px]" : "top-[-77.44px]"}`}
-        />
+        {/* Supplied hero photo. The Figma header fill (8bb609…) also darkens it and fades into the page; that composite is still to come. */}
+        <img src={assets.hero} alt="" className="pointer-events-none absolute left-0 top-0 w-full max-w-none" />
         <div className="relative flex w-full max-w-[1000px] flex-col items-start gap-[32px]">
           <LandingBanner />
           <div className="flex w-full flex-col items-start gap-[24px]">
@@ -137,6 +133,7 @@ export default function QuoteForm(props: Props) {
                         info
                         tooltip="You may select a minimum of 9 months and a maximum of 18 months for your period of insurance."
                         value={policy.endDate}
+                        rangeStart={policy.startDate}
                         onChange={(endDate) => onPolicy({ endDate })}
                       />
                     </div>
