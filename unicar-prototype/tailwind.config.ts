@@ -19,6 +19,11 @@ export default {
         "status-success": "var(--status-color-status-success)",
         line: "var(--utility-color-line)",
       },
+      backgroundImage: {
+        // --primary-gradient-light from the UniTravel prototype
+        "primary-gradient-light":
+          "linear-gradient(90deg,rgba(0,94,184,.06) 0.62%,rgba(92,85,235,.06) 100%),linear-gradient(#fff,#fff)",
+      },
       fontFamily: {
         sans: ['"Noto Sans"', "sans-serif"],
         inter: ['"Inter"', "sans-serif"],

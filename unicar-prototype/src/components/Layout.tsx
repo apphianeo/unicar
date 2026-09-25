@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { assets } from "../assets";
 
 // Header (8383:5192)
@@ -47,6 +48,30 @@ export function LandingBanner() {
           Travel with peace of mind with UOI, trusted protection with millions paid in claims
         </p>
       </div>
+    </div>
+  );
+}
+
+// Page frame shared by the landing and quote screens. The hero follows the UniTravel prototype
+// (apphianeo/purchase-flow): a fixed-height cropped photo (360px, 300px at ≤640px) with the light
+// primary gradient panel filling below it, so the image doesn't rescale as fields appear.
+export function PageShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-screen w-full flex-col items-center bg-bg-whitewashed">
+      <Header />
+      <section className="relative flex w-full flex-[1_0_auto] flex-col items-center px-[24px] py-[52px]">
+        <img
+          src={assets.hero}
+          alt=""
+          className="pointer-events-none absolute left-0 top-0 h-[360px] w-full object-cover object-center max-[640px]:h-[300px]"
+        />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 top-[360px] rounded-t-[12px] bg-primary-gradient-light max-[640px]:top-[300px]" />
+        <div className="relative flex w-full max-w-[1000px] flex-col items-start gap-[32px]">
+          <LandingBanner />
+          {children}
+        </div>
+      </section>
+      <FooterShort />
     </div>
   );
 }

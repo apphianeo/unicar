@@ -4,6 +4,8 @@ import hero from "./assets/hero.jpg";
 import singpassLogo from "./assets/singpass-logo.svg";
 import consentList from "./assets/consent-list.svg";
 import retrieveWithSingpass from "./assets/retrieve-with-singpass.svg";
+import retrieveWithSingpass300 from "./assets/retrieve-with-singpass-300.svg";
+import line124 from "./assets/line-124.svg";
 import questionMark from "./assets/question-mark.svg";
 import icDown from "./assets/ic-down.svg";
 import icDownDisabled from "./assets/ic-down-disabled.svg";
@@ -29,6 +31,8 @@ export const assets = {
   singpassLogo,
   consentList,
   retrieveWithSingpass,
+  retrieveWithSingpass300,
+  line124,
   questionMark,
   icDown,
   icDownDisabled,

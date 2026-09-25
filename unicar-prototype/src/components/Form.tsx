@@ -7,6 +7,8 @@ const bodyText = "text-[16px] font-normal leading-[1.5]";
 // Focused look taken from the Dropdown "focused" variant (I8543:26154;69:7932).
 const focusRing =
   "focus-within:border-primary-sureblue focus-within:shadow-[0_0_0_3px_rgba(0,94,184,0.2)]";
+// Same look, applied while a dropdown or date picker is open (the 3px ring sits outside the 48px field).
+const openRing = "border-primary-sureblue shadow-[0_0_0_3px_rgba(0,94,184,0.2)]";
 
 // Popover (8571:17325): 16px to the right of the (i) icon, vertically centred on it.
 export function Popover({ children }: { children: ReactNode }) {
@@ -57,11 +59,13 @@ type DropdownProps = {
   // Options that can be picked; others are shown but inert.
   selectable?: string[];
   onSelect?: (value: string) => void;
+  onOpen?: () => void;
   // Closed chevron colour differs per slot in the frames (#6E6E6E or #949494).
   chevron?: ChevronTone;
 };
 
-// Dropdown (Input field closed 69:7919, filled 90:1007, disabled 69:7952, focused + dropdown-overlay 69:7932/69:7854)
+// Dropdown (Input field closed 69:7919, filled 90:1007, disabled 69:7952,
+// focused + dropdown-overlay/40 69:7932 / 69:7854: menu 8px below the field, 48px rows, hover row #F6F6F6)
 export function Dropdown({
   label,
   info,
@@ -70,6 +74,7 @@ export function Dropdown({
   options,
   selectable,
   onSelect,
+  onOpen,
   chevron = "default",
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
@@ -85,49 +90,40 @@ export function Dropdown({
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
-  const chevronIcon = disabled
-    ? assets.icDownDisabled
-    : chevron === "tertiary"
-      ? assets.icDownTertiary
-      : assets.icDown;
+  const chevronIcon = open
+    ? assets.icUp
+    : disabled
+      ? assets.icDownDisabled
+      : chevron === "tertiary"
+        ? assets.icDownTertiary
+        : assets.icDown;
 
-  const text = disabled
-    ? "text-text-disabled"
-    : value
-      ? "text-text-primary"
-      : "text-text-tertiary";
+  const text = disabled ? "text-text-disabled" : value ? "text-text-primary" : "text-text-tertiary";
+  const look = disabled
+    ? "bg-disabled-bg"
+    : open
+      ? `bg-bg-white ${openRing}`
+      : "bg-bg-white";
 
   return (
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
       <InputHeader label={label} info={info} />
-      <button
-        type="button"
-        disabled={!canOpen}
-        onClick={() => setOpen(true)}
-        className={`${fieldBox} ${disabled ? "bg-disabled-bg" : "bg-bg-white"} ${canOpen ? "cursor-pointer" : "cursor-default"} text-left`}
-      >
-        <span className={`min-w-px flex-[1_0_0] ${bodyText} ${text}`}>{value || "Please select"}</span>
-        <img src={chevronIcon} alt="" width={16} height={16} className="size-[16px] shrink-0" />
-      </button>
+      <div className="relative w-full">
+        <button
+          type="button"
+          disabled={!canOpen}
+          onClick={() => {
+            if (!open) onOpen?.();
+            setOpen(!open);
+          }}
+          className={`${fieldBox} ${look} ${canOpen ? "cursor-pointer" : "cursor-default"} text-left`}
+        >
+          <span className={`min-w-px flex-[1_0_0] ${bodyText} ${text}`}>{value || "Please select"}</span>
+          <img src={chevronIcon} alt="" width={16} height={16} className="size-[16px] shrink-0" />
+        </button>
 
-      {open && options && (
-        <div className="absolute left-0 top-0 z-10 flex w-full flex-col items-start gap-[8px]">
-          <div className="flex w-full flex-col items-start gap-[12px]">
-            <InputHeader label={label} info={info} />
-            <div className="flex w-full flex-col items-start rounded-[8px] border-[3px] border-solid border-[rgba(0,94,184,0.2)]">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="flex h-[48px] w-full cursor-pointer items-center gap-[8px] rounded-[8px] border border-solid border-primary-sureblue bg-bg-white px-[16px] py-[12px] text-left"
-              >
-                <span className={`min-w-px flex-[1_0_0] ${bodyText} ${value ? "text-text-primary" : "text-text-tertiary"}`}>
-                  {value || "Please select"}
-                </span>
-                <img src={assets.icUp} alt="" width={16} height={16} className="size-[16px] shrink-0" />
-              </button>
-            </div>
-          </div>
-          <div className="flex w-full items-start overflow-clip rounded-[8px] drop-shadow-overlay">
+        {open && options && (
+          <div className="absolute left-0 top-[calc(100%+8px)] z-10 flex w-full items-start overflow-clip rounded-[8px] drop-shadow-overlay">
             <div className="flex min-w-px flex-[1_0_0] flex-col items-start">
               {options.map((opt) => {
                 const selected = opt === value;
@@ -141,7 +137,7 @@ export function Dropdown({
                       onSelect?.(opt);
                       setOpen(false);
                     }}
-                    className={`flex w-full items-center gap-[10px] bg-bg-white p-[12px] text-left ${pickable ? "cursor-pointer" : "cursor-default"}`}
+                    className={`flex h-[48px] w-full items-center gap-[10px] bg-bg-white p-[12px] text-left hover:bg-[#f6f6f6] ${pickable ? "cursor-pointer" : "cursor-default"}`}
                   >
                     <span
                       className={`min-w-px flex-[1_0_0] text-[16px] leading-[1.5] ${selected ? "font-medium text-primary-sureblue" : "font-normal text-text-primary"}`}
@@ -154,8 +150,8 @@ export function Dropdown({
               })}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -308,6 +304,7 @@ export function DateField({
   value,
   rangeStart,
   onChange,
+  onOpen,
 }: {
   label: string;
   info?: boolean;
@@ -316,6 +313,7 @@ export function DateField({
   // For the end-date picker: the chosen start date, shown as the start of the range.
   rangeStart?: string;
   onChange: (v: string) => void;
+  onOpen?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -329,31 +327,23 @@ export function DateField({
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
-  const field = open
-    ? "flex h-[54px] w-full items-center gap-[8px] rounded-[8px] border-[3px] border-solid border-[rgba(0,94,184,0.2)]"
-    : "";
-
   return (
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
       <InputHeader label={label} info={info} tooltip={tooltip} />
-      <div className={open ? `${field} -m-[3px] w-[calc(100%+6px)]` : "w-full"}>
-        <div
-          className={`${fieldBox} bg-bg-white ${open ? "border-primary-sureblue" : ""}`}
-          onClick={() => setOpen(true)}
-        >
-          <input
-            value={value}
-            inputMode="numeric"
-            placeholder="DD/MM/YYYY"
-            onFocus={() => setOpen(true)}
-            onChange={(e) => onChange(maskDate(e.target.value))}
-            className={`min-w-px flex-[1_0_0] bg-transparent text-text-primary outline-none placeholder:text-text-tertiary ${bodyText}`}
-          />
-          <img src={assets.calendar} alt="" width={24} height={24} className="size-[24px] shrink-0" />
-        </div>
+      <div className={`${fieldBox} bg-bg-white ${open ? openRing : ""}`} onClick={() => { onOpen?.(); setOpen(true); }}>
+        <input
+          value={value}
+          inputMode="numeric"
+          placeholder="DD/MM/YYYY"
+          onFocus={() => { onOpen?.(); setOpen(true); }}
+          onChange={(e) => onChange(maskDate(e.target.value))}
+          className={`min-w-px flex-[1_0_0] bg-transparent text-text-primary outline-none placeholder:text-text-tertiary ${bodyText}`}
+        />
+        <img src={assets.calendar} alt="" width={24} height={24} className="size-[24px] shrink-0" />
       </div>
       {open && (
-        <div className="absolute left-0 top-[calc(100%+8px)] z-10 w-full">
+        // Calendar keeps the DS Date Picker size (265 x 267), left-aligned 8px under the field.
+        <div className="absolute left-0 top-[calc(100%+8px)] z-10 w-[265px]">
           <Calendar
             selected={parseDate(value)}
             rangeStart={rangeStart ? parseDate(rangeStart) : undefined}

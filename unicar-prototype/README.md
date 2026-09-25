@@ -1,6 +1,6 @@
 # UniCar prototype: Singpass autofill (get quote)
 
-Clickable prototype of Figma `UniCar-Redesign`, section `8618:3276` ("User uses singpass autofill", Option 1),
+Clickable prototype of Figma `UniCar-Redesign`, section `8653:12503` ("User uses singpass autofill"),
 built from the Figma markup and the UOI Design System variables. Stack: Vite, React, TypeScript, Tailwind.
 No component library; behaviour is plain React state.
 
@@ -11,17 +11,20 @@ npm run build:preview   # one self-contained dist-preview/index.html for sharing
 ```
 
 ## Flow
-| # | Figma frame | What happens |
-|---|---|---|
-| 1 | `8383:5191` Get quote | Click **Retrieve with Singpass**. |
-| 2 | `8387:7681` Singpass consent | **Cancel** goes back to 1; **I Agree** goes to 3. |
-| 3 | `8517:3153` Singpass filled | Vehicle fields are locked. Fill the policy fields. |
-| 4 | `8390:8064` fields filled | Hover the (i) next to *Insurance end date* for the popover (`8571:17306`). |
-| 5 | `8543:25408` | **Check Price** shows the "We found 3 vehicles…" alert, with SKC5500A preselected and the other fields empty. |
-| 6 | `8543:25868` | Open the registration dropdown. |
-| 7 | `8543:26182` | Pick **SKC5500A**: make, power and year fill in and lock; fill the rest. |
+|## Flow
+| Figma frame | What happens |
+|---|---|
+| `8517:2744` Get quote | **Retrieve with Singpass** opens the consent. **Fill Manually** leads to a flow that isn't designed yet (inert). |
+| `8525:3731` Singpass consent | **Cancel** goes back; **I Agree** continues. |
+| `8543:25408` | 3 vehicles found: info alert, SKC5500A preselected. |
+| `8543:25868` | Registration dropdown open. |
+| `8543:26182` | SKC5500A picked: make, power and year fill in and lock. |
+| `8641:3667` … `8636:5316` | Vehicle details locked; the user fills the policy details (DS date pickers, NCD / experience / claims dropdowns). This layout starts when the user opens the first policy field. |
 
-## Assets (`src/assets/`)
+The hero follows the UniTravel prototype (`apphianeo/purchase-flow`): a 360px cropped photo (300px at ≤640px) with the
+light primary gradient panel below it.
+
+ (`src/assets/`)
 - Icons and the "Retrieve with Singpass" button are exported from the Figma nodes as-is.
 - Supplied by the design team: `logo.svg` (UOI logo), `singpass-logo.svg`, `consent-list.svg` (the whole white
   list panel of the consent screen), and `hero.jpg` (the photo from `unicar.svg`).
@@ -29,12 +32,12 @@ npm run build:preview   # one self-contained dist-preview/index.html for sharing
   background. Until that export arrives, the raw photo is used.
 
 ## Date picker
-Uses the UOI DS Date Picker "expanded" variants (start-date `1276:3259`, end-date `1276:3256`): it opens on focus,
+Uses the UOI DS Date Picker "expanded" variants (start-date `1276:3259`, end-date `1276:3256`) at the DS size
+(265 × 267, 8px under the field, left-aligned): it opens on focus,
 the arrows change the month, and picking a day fills `DD/MM/YYYY`. The end-date calendar shows the range from the start date.
 The month and year carets have no designed menu, so they are labels only.
 
 ## Not in the design, so left inert or empty
-- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, *Clear Form*, promo *Apply* and its ✕, and *Check Price* after step 5.
+- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, *Clear Form*, promo *Apply* and its ✕, *Fill Manually*, and *Check Price*.
 - SGT5899C and SVT02934G are listed but cannot be picked, because no details for them are designed.
-- The vehicle dropdowns on the first screen have no options, since none are designed.
 - Text inputs use the Dropdown "focused" look (blue border with a 3px ring) when focused.

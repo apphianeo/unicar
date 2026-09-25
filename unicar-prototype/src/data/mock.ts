@@ -6,8 +6,8 @@ export const vehicleDetails: Record<string, { make: string; power: string; year:
   SKC5500A: { make: "AION ES ELECTRIC", power: "100", year: "2025" },
 };
 
-export const ncdOptions = ["10%"];
-export const experienceOptions = ["3 years or less"];
-export const claimsOptions = ["1"];
+export const ncdOptions = ["0%", "10%", "20%", "30%", "40%", "50%"];
+export const experienceOptions = ["3 years or less", "4 to 8 years", "More than 8 years"];
+export const claimsOptions = ["0", "1", "2", "3 or more"];
 
 export const promoCode = "CAR60";
