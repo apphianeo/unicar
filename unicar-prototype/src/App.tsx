@@ -2,6 +2,7 @@ import { useState } from "react";
 import Landing from "./screens/Landing";
 import QuoteForm, { type Policy, type QuoteStep } from "./screens/QuoteForm";
 import SingpassConsent from "./screens/SingpassConsent";
+import { parseDate } from "./components/Form";
 
 const emptyPolicy: Policy = { startDate: "", endDate: "", driveAtWork: "No" };
 
@@ -41,7 +42,25 @@ export default function App() {
       onStartPolicy={() => setStep((s) => (s === "picked" ? "details" : s))}
       onOffPeak={setOffPeak}
       onPower={setPower}
-      onPolicy={(p) => setPolicy((prev) => ({ ...prev, ...p }))}
+      onPolicy={(p) =>
+        setPolicy((prev) => {
+          const next = { ...prev, ...p };
+          // A new start date clears an end date that no longer falls 9 to 18 months after it.
+          if (p.startDate !== undefined && next.endDate) {
+            const s = parseDate(next.startDate);
+            const e = parseDate(next.endDate);
+            const min = s && new Date(s.getFullYear(), s.getMonth() + 9, s.getDate());
+            const max = s && new Date(s.getFullYear(), s.getMonth() + 18, s.getDate());
+            if (!s || !e || (min && e < min) || (max && e > max)) next.endDate = "";
+          }
+          return next;
+        })
+      }
+      onClearForm={() => {
+        setPolicy(emptyPolicy);
+        setOffPeak("No");
+        setPower("");
+      }}
     />
   );
 }

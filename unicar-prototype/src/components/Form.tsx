@@ -191,7 +191,7 @@ function maskDate(raw: string) {
   return [d.slice(0, 2), d.slice(2, 4), d.slice(4, 8)].filter(Boolean).join("/");
 }
 
-function parseDate(v: string) {
+export function parseDate(v: string) {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
   if (!m) return undefined;
   const d = new Date(+m[3], +m[2] - 1, +m[1]);
@@ -199,7 +199,7 @@ function parseDate(v: string) {
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
-const formatDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+export const formatDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 const sameDay = (a?: Date, b?: Date) => !!a && !!b && a.toDateString() === b.toDateString();
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -209,14 +209,19 @@ const dayText = "whitespace-nowrap text-center text-[14px] font-medium leading-[
 function Calendar({
   selected,
   rangeStart,
+  minDate,
+  maxDate,
   onPick,
 }: {
   selected?: Date;
   // End-date type: highlights the range from the start date to the selected date.
   rangeStart?: Date;
+  // Days outside [minDate, maxDate] can't be picked (shown in Type/color-text-disabled).
+  minDate?: Date;
+  maxDate?: Date;
   onPick: (d: Date) => void;
 }) {
-  const initial = selected ?? rangeStart ?? new Date();
+  const initial = selected ?? minDate ?? rangeStart ?? new Date();
   const [month, setMonth] = useState(new Date(initial.getFullYear(), initial.getMonth(), 1));
   const selectedTime = selected?.getTime();
   useEffect(() => {
@@ -269,21 +274,23 @@ function Calendar({
             {week.map((d, di) => {
               if (!d) return <div key={di} className="min-w-px flex-[1_0_0]" />;
               const isSel = sameDay(d, selected) || sameDay(d, rangeStart);
+              const blocked = (!!minDate && d < minDate) || (!!maxDate && d > maxDate);
               const band = inRange(d);
               const bandShape = `${sameDay(d, rangeStart) ? "rounded-l-[24px]" : ""} ${sameDay(d, selected) ? "rounded-r-[24px]" : ""}`;
               return (
                 <button
                   key={di}
                   type="button"
+                  disabled={blocked && !isSel}
                   onClick={() => onPick(d)}
-                  className={`flex h-[30px] min-w-px flex-[1_0_0] cursor-pointer items-center justify-center ${band ? `bg-[rgba(0,94,184,0.2)] ${bandShape}` : ""}`}
+                  className={`flex h-[30px] min-w-px flex-[1_0_0] items-center justify-center ${blocked ? "cursor-default" : "cursor-pointer"} ${band ? `bg-[rgba(0,94,184,0.2)] ${bandShape}` : ""}`}
                 >
                   {isSel ? (
                     <span className="flex size-[30px] items-center justify-center rounded-[40px] bg-primary-sureblue">
                       <span className={`${dayText} text-white`}>{pad(d.getDate())}</span>
                     </span>
                   ) : (
-                    <span className={`${dayText} text-text-primary`}>{pad(d.getDate())}</span>
+                    <span className={`${dayText} ${blocked ? "text-text-disabled" : "text-text-primary"}`}>{pad(d.getDate())}</span>
                   )}
                 </button>
               );
@@ -303,6 +310,8 @@ export function DateField({
   tooltip,
   value,
   rangeStart,
+  minDate,
+  maxDate,
   onChange,
   onOpen,
 }: {
@@ -312,6 +321,9 @@ export function DateField({
   value: string;
   // For the end-date picker: the chosen start date, shown as the start of the range.
   rangeStart?: string;
+  // Allowed range for this date (DD/MM/YYYY is rejected outside it).
+  minDate?: Date;
+  maxDate?: Date;
   onChange: (v: string) => void;
   onOpen?: () => void;
 }) {
@@ -336,7 +348,13 @@ export function DateField({
           inputMode="numeric"
           placeholder="DD/MM/YYYY"
           onFocus={() => { onOpen?.(); setOpen(true); }}
-          onChange={(e) => onChange(maskDate(e.target.value))}
+          onChange={(e) => {
+            const v = maskDate(e.target.value);
+            const d = parseDate(v);
+            // A complete date outside the allowed range isn't accepted.
+            if (d && ((minDate && d < minDate) || (maxDate && d > maxDate))) return onChange("");
+            onChange(v);
+          }}
           className={`min-w-px flex-[1_0_0] bg-transparent text-text-primary outline-none placeholder:text-text-tertiary ${bodyText}`}
         />
         <img src={assets.calendar} alt="" width={24} height={24} className="size-[24px] shrink-0" />
@@ -347,6 +365,8 @@ export function DateField({
           <Calendar
             selected={parseDate(value)}
             rangeStart={rangeStart ? parseDate(rangeStart) : undefined}
+            minDate={minDate}
+            maxDate={maxDate}
             onPick={(d) => {
               onChange(formatDate(d));
               setOpen(false);

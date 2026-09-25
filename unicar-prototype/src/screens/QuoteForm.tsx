@@ -1,6 +1,6 @@
 import { assets } from "../assets";
 import { Button, TextButton } from "../components/Button";
-import { DateField, Divider, Dropdown, InfoAlert, PromoField, RadioGroup, TextField } from "../components/Form";
+import { DateField, parseDate, Divider, Dropdown, InfoAlert, PromoField, RadioGroup, TextField } from "../components/Form";
 import { ClearFormCard } from "../components/InfoCard";
 import { PageShell } from "../components/Layout";
 import { claimsOptions, experienceOptions, ncdOptions, promoCode, registrationNumbers, vehicleDetails } from "../data/mock";
@@ -30,17 +30,24 @@ type Props = {
   onOffPeak: (v: "Yes" | "No") => void;
   onPower: (v: string) => void;
   onPolicy: (p: Partial<Policy>) => void;
+  onClearForm: () => void;
 };
+
+const addMonths = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
 
 export default function QuoteForm(props: Props) {
   const { step, regNo, offPeak, power, policy, onPolicy, onStartPolicy } = props;
   const locked = step !== "found" && regNo ? vehicleDetails[regNo] : undefined;
+  // Period of insurance: end date 9 to 18 months after the start date.
+  const start = parseDate(policy.startDate);
+  const endMin = start && addMonths(start, 9);
+  const endMax = start && addMonths(start, 18);
 
   return (
     <PageShell>
       {/* Row 2 groups the card and form with a 24px gap; row 3 frames space them 32px apart. */}
       <div className={`flex w-full flex-col items-start ${step === "details" ? "gap-[32px]" : "gap-[24px]"}`}>
-        <ClearFormCard />
+        <ClearFormCard onClear={props.onClearForm} />
 
         <div className="flex w-full flex-col items-end justify-center gap-[32px] rounded-[12px] bg-bg-white p-[16px] drop-shadow-overlay">
           {step === "found" && (
@@ -104,6 +111,8 @@ export default function QuoteForm(props: Props) {
                 tooltip="You may select a minimum of 9 months and a maximum of 18 months for your period of insurance."
                 value={policy.endDate}
                 rangeStart={policy.startDate}
+                minDate={endMin}
+                maxDate={endMax}
                 onOpen={onStartPolicy}
                 onChange={(endDate) => onPolicy({ endDate })}
               />

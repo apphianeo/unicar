@@ -11,7 +11,6 @@ npm run build:preview   # one self-contained dist-preview/index.html for sharing
 ```
 
 ## Flow
-|## Flow
 | Figma frame | What happens |
 |---|---|
 | `8517:2744` Get quote | **Retrieve with Singpass** opens the consent. **Fill Manually** leads to a flow that isn't designed yet (inert). |
@@ -21,10 +20,12 @@ npm run build:preview   # one self-contained dist-preview/index.html for sharing
 | `8543:26182` | SKC5500A picked: make, power and year fill in and lock. |
 | `8641:3667` … `8636:5316` | Vehicle details locked; the user fills the policy details (DS date pickers, NCD / experience / claims dropdowns). This layout starts when the user opens the first policy field. |
 
-The hero follows the UniTravel prototype (`apphianeo/purchase-flow`): a 360px cropped photo (300px at ≤640px) with the
-light primary gradient panel below it.
+Hero: the photo fills the top 50% of the screen; the UniTravel light primary gradient panel (`apphianeo/purchase-flow`)
+fills the rest. **Clear Form** clears what the user filled in (policy fields, radios back to No); details retrieved from
+Singpass stay. The insurance end date must be 9 to 18 months after the start date: other days are greyed out in the
+calendar, a typed date outside that range isn't accepted, and changing the start date clears an end date that no longer fits.
 
- (`src/assets/`)
+## Assets (`src/assets/`)
 - Icons and the "Retrieve with Singpass" button are exported from the Figma nodes as-is.
 - Supplied by the design team: `logo.svg` (UOI logo), `singpass-logo.svg`, `consent-list.svg` (the whole white
   list panel of the consent screen), and `hero.jpg` (the photo from `unicar.svg`).
@@ -38,6 +39,6 @@ the arrows change the month, and picking a day fills `DD/MM/YYYY`. The end-date 
 The month and year carets have no designed menu, so they are labels only.
 
 ## Not in the design, so left inert or empty
-- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, *Clear Form*, promo *Apply* and its ✕, *Fill Manually*, and *Check Price*.
+- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, *Fill Manually*, and *Check Price* (next flow).
 - SGT5899C and SVT02934G are listed but cannot be picked, because no details for them are designed.
 - Text inputs use the Dropdown "focused" look (blue border with a 3px ring) when focused.
