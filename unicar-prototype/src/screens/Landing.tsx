@@ -2,7 +2,7 @@ import { assets } from "../assets";
 import { PageShell } from "../components/Layout";
 
 // Get quote (8517:2744): Main Container 8521:3651
-export default function Landing({ onRetrieve }: { onRetrieve: () => void }) {
+export default function Landing({ onRetrieve, onFillManually }: { onRetrieve: () => void; onFillManually: () => void }) {
   return (
     <PageShell>
       <div className="flex h-[320px] w-full flex-col items-center justify-center gap-[32px] rounded-[12px] bg-bg-white p-[16px] drop-shadow-overlay">
@@ -24,9 +24,9 @@ export default function Landing({ onRetrieve }: { onRetrieve: () => void }) {
               <p className="whitespace-nowrap text-center text-[14px] font-normal leading-[1.5] text-text-tertiary">OR</p>
               <img src={assets.line124} alt="" width={124} height={1} className="h-px min-w-px flex-[1_0_0]" />
             </div>
-            {/* Fill Manually leads to a flow that isn't designed yet, so it is inert for now. */}
             <button
               type="button"
+              onClick={onFillManually}
               className="flex w-[300px] cursor-pointer items-center justify-center rounded-[8px] border border-solid border-primary-sureblue bg-bg-white px-[24px] py-[12px] drop-shadow-overlay"
             >
               <span className="whitespace-nowrap text-[16px] font-medium leading-[1.5] text-primary-sureblue">

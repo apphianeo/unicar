@@ -124,7 +124,8 @@ export function Dropdown({
 
         {open && options && (
           <div className="absolute left-0 top-[calc(100%+8px)] z-10 flex w-full items-start overflow-clip rounded-[8px] drop-shadow-overlay">
-            <div className="flex min-w-px flex-[1_0_0] flex-col items-start">
+            {/* Menu shows up to 8 rows (384px) and scrolls beyond that (8647:16348 slider). */}
+            <div className="ds-scroll flex max-h-[384px] min-w-px flex-[1_0_0] flex-col items-start overflow-y-auto">
               {options.map((opt) => {
                 const selected = opt === value;
                 const pickable = !selectable || selectable.includes(opt);
@@ -137,7 +138,7 @@ export function Dropdown({
                       onSelect?.(opt);
                       setOpen(false);
                     }}
-                    className={`flex h-[48px] w-full items-center gap-[10px] bg-bg-white p-[12px] text-left hover:bg-[#f6f6f6] ${pickable ? "cursor-pointer" : "cursor-default"}`}
+                    className={`flex h-[48px] w-full shrink-0 items-center gap-[10px] bg-bg-white p-[12px] text-left hover:bg-[#f6f6f6] ${pickable ? "cursor-pointer" : "cursor-default"}`}
                   >
                     <span
                       className={`min-w-px flex-[1_0_0] text-[16px] leading-[1.5] ${selected ? "font-medium text-primary-sureblue" : "font-normal text-text-primary"}`}
@@ -162,12 +163,15 @@ export function TextField({
   placeholder,
   value,
   disabled,
+  disabledTone = "disabled",
   onChange,
 }: {
   label: string;
   placeholder: string;
   value: string;
   disabled?: boolean;
+  // Locked value colour differs per frame: #BDBDBD (Singpass-filled) or #949494 (manual, 8649:7822).
+  disabledTone?: "disabled" | "tertiary";
   onChange?: (v: string) => void;
 }) {
   return (
@@ -179,7 +183,7 @@ export function TextField({
           disabled={disabled}
           placeholder={placeholder}
           onChange={(e) => onChange?.(e.target.value)}
-          className={`min-w-px flex-[1_0_0] bg-transparent outline-none placeholder:text-text-tertiary ${bodyText} ${disabled ? "text-text-disabled" : "text-text-primary"}`}
+          className={`min-w-px flex-[1_0_0] bg-transparent outline-none placeholder:text-text-tertiary ${bodyText} ${disabled ? (disabledTone === "tertiary" ? "text-text-tertiary" : "text-text-disabled") : "text-text-primary"}`}
         />
       </div>
     </div>

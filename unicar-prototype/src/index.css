@@ -30,3 +30,8 @@ body {
   font-family: "Noto Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Dropdown menu scrollbar (8647:16348 "slider"): 4px #949494 thumb, radius 2, 5px from the right, 10px top/bottom. */
+.ds-scroll::-webkit-scrollbar { width: 14px; }
+.ds-scroll::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
+.ds-scroll::-webkit-scrollbar-thumb { background: #949494; border-radius: 7px; border: 5px solid transparent; background-clip: content-box; }

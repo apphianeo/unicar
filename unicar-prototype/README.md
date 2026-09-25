@@ -1,6 +1,6 @@
 # UniCar prototype: Singpass autofill (get quote)
 
-Clickable prototype of Figma `UniCar-Redesign`, section `8653:12503` ("User uses singpass autofill"),
+Clickable prototype of Figma `UniCar-Redesign`, sections `8653:12503` ("User uses singpass autofill") and `8653:12505` (fill manually),
 built from the Figma markup and the UOI Design System variables. Stack: Vite, React, TypeScript, Tailwind.
 No component library; behaviour is plain React state.
 
@@ -13,16 +13,20 @@ npm run build:preview   # one self-contained dist-preview/index.html for sharing
 ## Flow
 | Figma frame | What happens |
 |---|---|
-| `8517:2744` Get quote | **Retrieve with Singpass** opens the consent. **Fill Manually** leads to a flow that isn't designed yet (inert). |
+| `8517:2744` Get quote | **Retrieve with Singpass** opens the consent. **Fill Manually** opens the manual form. |
 | `8525:3731` Singpass consent | **Cancel** goes back; **I Agree** continues. |
 | `8543:25408` | 3 vehicles found: info alert, SKC5500A preselected. |
 | `8543:25868` | Registration dropdown open. |
 | `8543:26182` | SKC5500A picked: make, power and year fill in and lock. |
 | `8641:3667` … `8636:5316` | Vehicle details locked; the user fills the policy details (DS date pickers, NCD / experience / claims dropdowns). This layout starts when the user opens the first policy field. |
 
+Fill manually (`8636:3287` onwards): vehicle registration number is typed; make/model and year come from the
+8 options drawn in each dropdown (menus scroll past 8 rows). Picking AION ES ELECTRIC fills power rating 100 and locks it;
+power values for the other models are still to come, so the field stays editable for them. Check Price always shows.
+
 Hero: the photo fills the top 50% of the screen; the UniTravel light primary gradient panel (`apphianeo/purchase-flow`)
-fills the rest. **Clear Form** clears what the user filled in (policy fields, radios back to No); details retrieved from
-Singpass stay. The insurance end date must be 9 to 18 months after the start date: other days are greyed out in the
+fills the rest. **Clear Form** takes the form back to how it looked right after Singpass (vehicle picker with the alert, policy
+fields empty, radios back to No). The insurance end date must be 9 to 18 months after the start date: other days are greyed out in the
 calendar, a typed date outside that range isn't accepted, and changing the start date clears an end date that no longer fits.
 
 ## Assets (`src/assets/`)
@@ -39,6 +43,6 @@ the arrows change the month, and picking a day fills `DD/MM/YYYY`. The end-date 
 The month and year carets have no designed menu, so they are labels only.
 
 ## Not in the design, so left inert or empty
-- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, *Fill Manually*, and *Check Price* (next flow).
+- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, and *Check Price* (next flow).
 - SGT5899C and SVT02934G are listed but cannot be picked, because no details for them are designed.
 - Text inputs use the Dropdown "focused" look (blue border with a 3px ring) when focused.

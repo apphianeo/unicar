@@ -1,19 +1,57 @@
 import { useState } from "react";
-import Landing from "./screens/Landing";
-import QuoteForm, { type Policy, type QuoteStep } from "./screens/QuoteForm";
-import SingpassConsent from "./screens/SingpassConsent";
+import { emptyPolicy, endDateRange, type Policy } from "./components/PolicySection";
 import { parseDate } from "./components/Form";
+import Landing from "./screens/Landing";
+import ManualForm, { type ManualVehicle } from "./screens/ManualForm";
+import QuoteForm, { type QuoteStep } from "./screens/QuoteForm";
+import SingpassConsent from "./screens/SingpassConsent";
 
-const emptyPolicy: Policy = { startDate: "", endDate: "", driveAtWork: "No" };
+const emptyVehicle: ManualVehicle = { regNo: "", power: "" };
+
+// A new start date clears an end date that no longer falls 9 to 18 months after it.
+function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
+  const next = { ...prev, ...p };
+  if (p.startDate !== undefined && next.endDate) {
+    const { min, max } = endDateRange(next.startDate);
+    const e = parseDate(next.endDate);
+    if (!min || !max || !e || e < min || e > max) next.endDate = "";
+  }
+  return next;
+}
 
 export default function App() {
-  const [step, setStep] = useState<"landing" | "consent" | QuoteStep>("landing");
+  const [step, setStep] = useState<"landing" | "consent" | "manual" | QuoteStep>("landing");
+  const [manual, setManual] = useState<ManualVehicle>(emptyVehicle);
   const [regNo, setRegNo] = useState<string>();
   const [offPeak, setOffPeak] = useState<"Yes" | "No">("No");
   const [power, setPower] = useState("");
   const [policy, setPolicy] = useState<Policy>(emptyPolicy);
 
-  if (step === "landing") return <Landing onRetrieve={() => setStep("consent")} />;
+  if (step === "landing") {
+    return (
+      <Landing
+        onRetrieve={() => setStep("consent")}
+        onFillManually={() => {
+          setManual(emptyVehicle);
+          setOffPeak("No");
+          setPolicy(emptyPolicy);
+          setStep("manual");
+        }}
+      />
+    );
+  }
+  if (step === "manual") {
+    return (
+      <ManualForm
+        vehicle={manual}
+        offPeak={offPeak}
+        policy={policy}
+        onVehicle={(v) => setManual((prev) => ({ ...prev, ...v }))}
+        onOffPeak={setOffPeak}
+        onPolicy={(p) => setPolicy((prev) => applyPolicy(prev, p))}
+      />
+    );
+  }
   if (step === "consent") {
     return (
       <SingpassConsent
@@ -42,21 +80,11 @@ export default function App() {
       onStartPolicy={() => setStep((s) => (s === "picked" ? "details" : s))}
       onOffPeak={setOffPeak}
       onPower={setPower}
-      onPolicy={(p) =>
-        setPolicy((prev) => {
-          const next = { ...prev, ...p };
-          // A new start date clears an end date that no longer falls 9 to 18 months after it.
-          if (p.startDate !== undefined && next.endDate) {
-            const s = parseDate(next.startDate);
-            const e = parseDate(next.endDate);
-            const min = s && new Date(s.getFullYear(), s.getMonth() + 9, s.getDate());
-            const max = s && new Date(s.getFullYear(), s.getMonth() + 18, s.getDate());
-            if (!s || !e || (min && e < min) || (max && e > max)) next.endDate = "";
-          }
-          return next;
-        })
-      }
+      onPolicy={(p) => setPolicy((prev) => applyPolicy(prev, p))}
+      // Clear Form takes the form back to how it looked right after Singpass (8543:25408).
       onClearForm={() => {
+        setRegNo("SKC5500A");
+        setStep("found");
         setPolicy(emptyPolicy);
         setOffPeak("No");
         setPower("");

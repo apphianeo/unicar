@@ -1,23 +1,15 @@
-import { assets } from "../assets";
-import { Button, TextButton } from "../components/Button";
-import { DateField, parseDate, Divider, Dropdown, InfoAlert, PromoField, RadioGroup, TextField } from "../components/Form";
+import { Dropdown, InfoAlert, RadioGroup, TextField } from "../components/Form";
 import { ClearFormCard } from "../components/InfoCard";
 import { PageShell } from "../components/Layout";
-import { claimsOptions, experienceOptions, ncdOptions, promoCode, registrationNumbers, vehicleDetails } from "../data/mock";
+import { PolicySection, type Policy } from "../components/PolicySection";
+import { registrationNumbers, vehicleDetails } from "../data/mock";
+
+export type { Policy };
 
 // found   = 8543:25408 (3 vehicles found) and 8543:25868 (registration dropdown open)
 // picked  = 8543:26182 (vehicle picked: details locked)
 // details = 8641:3667 onwards (Vehicle details locked, policy fields being filled)
 export type QuoteStep = "found" | "picked" | "details";
-
-export type Policy = {
-  startDate: string;
-  endDate: string;
-  ncd?: string;
-  experience?: string;
-  claims?: string;
-  driveAtWork: "Yes" | "No";
-};
 
 type Props = {
   step: QuoteStep;
@@ -33,15 +25,10 @@ type Props = {
   onClearForm: () => void;
 };
 
-const addMonths = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
 
 export default function QuoteForm(props: Props) {
   const { step, regNo, offPeak, power, policy, onPolicy, onStartPolicy } = props;
   const locked = step !== "found" && regNo ? vehicleDetails[regNo] : undefined;
-  // Period of insurance: end date 9 to 18 months after the start date.
-  const start = parseDate(policy.startDate);
-  const endMin = start && addMonths(start, 9);
-  const endMax = start && addMonths(start, 18);
 
   return (
     <PageShell>
@@ -96,68 +83,7 @@ export default function QuoteForm(props: Props) {
             </div>
           </div>
 
-          <div className="flex w-full flex-col items-start gap-[24px]">
-            <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Policy details</p>
-            <div className="flex w-full items-start gap-[24px]">
-              <DateField
-                label="Insurance start date"
-                value={policy.startDate}
-                onOpen={onStartPolicy}
-                onChange={(startDate) => onPolicy({ startDate })}
-              />
-              <DateField
-                label="Insurance end date"
-                info
-                tooltip="You may select a minimum of 9 months and a maximum of 18 months for your period of insurance."
-                value={policy.endDate}
-                rangeStart={policy.startDate}
-                minDate={endMin}
-                maxDate={endMax}
-                onOpen={onStartPolicy}
-                onChange={(endDate) => onPolicy({ endDate })}
-              />
-            </div>
-            <div className="flex w-full items-start gap-[24px]">
-              <Dropdown
-                label="No claims discount (NCD)"
-                info
-                value={policy.ncd}
-                options={ncdOptions}
-                onOpen={onStartPolicy}
-                onSelect={(ncd) => onPolicy({ ncd })}
-              />
-              <Dropdown
-                label="Years of driving experience"
-                value={policy.experience}
-                options={experienceOptions}
-                onOpen={onStartPolicy}
-                onSelect={(experience) => onPolicy({ experience })}
-              />
-            </div>
-            <div className="flex w-full items-start gap-[24px]">
-              <Dropdown
-                label="Claims made in the last 3 years"
-                info
-                value={policy.claims}
-                options={claimsOptions}
-                onOpen={onStartPolicy}
-                onSelect={(claims) => onPolicy({ claims })}
-              />
-              <RadioGroup
-                label="I drive at work"
-                value={policy.driveAtWork}
-                onChange={(driveAtWork) => onPolicy({ driveAtWork })}
-                className="min-w-px flex-[1_0_0] self-stretch"
-              />
-            </div>
-          </div>
-          <Divider />
-          <div className="flex w-full flex-col items-start gap-[12px]">
-            <PromoField code={promoCode} />
-            <TextButton icon={assets.icPlus}>Have an Agent ID?</TextButton>
-          </div>
-          {/* The screen after Check Price isn't designed yet. */}
-          <Button variant="primary">Check Price</Button>
+          <PolicySection policy={policy} onPolicy={onPolicy} onStartPolicy={onStartPolicy} />
         </div>
       </div>
     </PageShell>
