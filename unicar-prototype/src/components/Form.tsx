@@ -13,10 +13,10 @@ const openRing = "border-primary-sureblue shadow-[0_0_0_3px_rgba(0,94,184,0.2)]"
 // Popover (8571:17325): 16px to the right of the (i) icon, vertically centred on it.
 export function Popover({ children }: { children: ReactNode }) {
   return (
-    <div className="absolute left-[calc(100%+16px)] top-1/2 z-20 flex w-[280px] max-w-[280px] -translate-y-1/2 items-center drop-shadow-popover">
-      <div className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[8px] overflow-clip rounded-[8px] bg-bg-white p-[12px]">
-        <p className="w-full text-[14px] font-normal leading-[1.5] text-text-primary">{children}</p>
-      </div>
+    <span className="absolute left-[calc(100%+16px)] top-1/2 z-20 flex w-[280px] max-w-[280px] -translate-y-1/2 cursor-default items-center text-left drop-shadow-popover">
+      <span className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[8px] overflow-clip rounded-[8px] bg-bg-white p-[12px]">
+        <span className="block w-full whitespace-normal text-[14px] font-normal leading-[1.5] text-text-primary">{children}</span>
+      </span>
       <img
         src={assets.popoverArrow}
         alt=""
@@ -24,25 +24,44 @@ export function Popover({ children }: { children: ReactNode }) {
         height={16}
         className="absolute left-[-8px] top-[calc(50%+0.5px)] h-[16px] w-[8px] -translate-y-1/2"
       />
-    </div>
+    </span>
   );
 }
 
-// Input Header (284:2992 with info icon, 284:2998 without)
+// Input Header (284:2992 with info icon, 284:2998 without). The (i) opens its Popover on hover, focus or tap.
 export function InputHeader({ label, info, tooltip }: { label: string; info?: boolean; tooltip?: string }) {
   const [hover, setHover] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const ref = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!pinned) return;
+    const close = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setPinned(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [pinned]);
+
   return (
     <div className="flex h-[21px] items-center gap-[8px]">
       <p className="whitespace-nowrap text-[14px] font-normal leading-[1.5] text-text-primary">{label}</p>
       {info && (
-        <div
-          className="relative size-[16px] shrink-0"
-          onMouseEnter={() => tooltip && setHover(true)}
+        <button
+          ref={ref}
+          type="button"
+          aria-label={`About ${label}`}
+          aria-expanded={!!tooltip && (hover || pinned)}
+          className="relative size-[16px] shrink-0 cursor-pointer"
+          onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
+          onFocus={() => setHover(true)}
+          onBlur={() => setHover(false)}
+          onClick={() => setPinned((v) => !v)}
         >
           <img src={assets.info} alt="" width={16} height={16} className="block size-[16px]" />
-          {hover && tooltip && <Popover>{tooltip}</Popover>}
-        </div>
+          {tooltip && (hover || pinned) && <Popover>{tooltip}</Popover>}
+        </button>
       )}
     </div>
   );
@@ -53,6 +72,7 @@ type ChevronTone = "default" | "tertiary";
 type DropdownProps = {
   label: string;
   info?: boolean;
+  tooltip?: string;
   value?: string;
   disabled?: boolean;
   options?: string[];
@@ -69,6 +89,7 @@ type DropdownProps = {
 export function Dropdown({
   label,
   info,
+  tooltip,
   value,
   disabled,
   options,
@@ -107,7 +128,7 @@ export function Dropdown({
 
   return (
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
-      <InputHeader label={label} info={info} />
+      <InputHeader label={label} info={info} tooltip={tooltip} />
       <div className="relative w-full">
         <button
           type="button"
@@ -124,8 +145,8 @@ export function Dropdown({
 
         {open && options && (
           <div className="absolute left-0 top-[calc(100%+8px)] z-10 flex w-full items-start overflow-clip rounded-[8px] drop-shadow-overlay">
-            {/* Menu shows up to 8 rows (384px) and scrolls beyond that (8647:16348 slider). */}
-            <div className="ds-scroll flex max-h-[384px] min-w-px flex-[1_0_0] flex-col items-start overflow-y-auto">
+            {/* Every menu is cut at the same fixed height (6 rows, 288px) and scrolls beyond it (8647:16348 slider). */}
+            <div className="ds-scroll flex max-h-[288px] min-w-px flex-[1_0_0] flex-col items-start overflow-y-auto">
               {options.map((opt) => {
                 const selected = opt === value;
                 const pickable = !selectable || selectable.includes(opt);
@@ -401,15 +422,17 @@ export function RadioGroup({
   value,
   onChange,
   className = "",
+  tooltip,
 }: {
   label: string;
+  tooltip?: string;
   value: "Yes" | "No";
   onChange: (v: "Yes" | "No") => void;
   className?: string;
 }) {
   return (
     <div className={`flex flex-col items-start gap-[12px] ${className}`}>
-      <InputHeader label={label} info />
+      <InputHeader label={label} info tooltip={tooltip} />
       <div className="flex min-h-px w-full flex-[1_0_0] items-center gap-[32px]">
         {(["Yes", "No"] as const).map((opt) => (
           <RadioItem key={opt} label={opt} selected={value === opt} onClick={() => onChange(opt)} />

@@ -1,10 +1,17 @@
-import { useState } from "react";
-import { emptyPolicy, endDateRange, type Policy } from "./components/PolicySection";
+import { useEffect, useState } from "react";
 import { parseDate } from "./components/Form";
+import { emptyPolicy, endDateRange, type Policy } from "./components/PolicySection";
 import Landing from "./screens/Landing";
-import ManualForm, { type ManualVehicle } from "./screens/ManualForm";
-import QuoteForm, { type QuoteStep } from "./screens/QuoteForm";
+import QuoteForm, { type ManualVehicle } from "./screens/QuoteForm";
 import SingpassConsent from "./screens/SingpassConsent";
+
+// Each page has its own URL hash, so the browser's Back and Forward buttons move through the flow.
+type Page = "landing" | "consent" | "quote" | "manual";
+const pages: Page[] = ["landing", "consent", "quote", "manual"];
+const pageFromHash = (): Page => {
+  const h = window.location.hash.replace("#", "") as Page;
+  return pages.includes(h) ? h : "landing";
+};
 
 const emptyVehicle: ManualVehicle = { regNo: "", power: "" };
 
@@ -20,74 +27,77 @@ function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
 }
 
 export default function App() {
-  const [step, setStep] = useState<"landing" | "consent" | "manual" | QuoteStep>("landing");
-  const [manual, setManual] = useState<ManualVehicle>(emptyVehicle);
-  const [regNo, setRegNo] = useState<string>();
+  const [page, setPage] = useState<Page>("landing");
+  // true once Singpass has filled the vehicle details; Clear Form sets it back to false.
+  const [singpassFilled, setSingpassFilled] = useState(false);
+  const [vehicle, setVehicle] = useState<ManualVehicle>(emptyVehicle);
   const [offPeak, setOffPeak] = useState<"Yes" | "No">("No");
-  const [power, setPower] = useState("");
   const [policy, setPolicy] = useState<Policy>(emptyPolicy);
 
-  if (step === "landing") {
-    return (
-      <Landing
-        onRetrieve={() => setStep("consent")}
-        onFillManually={() => {
-          setManual(emptyVehicle);
-          setOffPeak("No");
-          setPolicy(emptyPolicy);
-          setStep("manual");
-        }}
-      />
-    );
-  }
-  if (step === "manual") {
-    return (
-      <ManualForm
-        vehicle={manual}
-        offPeak={offPeak}
-        policy={policy}
-        onVehicle={(v) => setManual((prev) => ({ ...prev, ...v }))}
-        onOffPeak={setOffPeak}
-        onPolicy={(p) => setPolicy((prev) => applyPolicy(prev, p))}
-      />
-    );
-  }
-  if (step === "consent") {
+  useEffect(() => {
+    // Start at the landing page; a form page opened directly has no data to show.
+    if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
+    const onHash = () => {
+      setPage(pageFromHash());
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const go = (p: Page) => {
+    window.location.hash = p;
+  };
+
+  const resetForm = () => {
+    setVehicle(emptyVehicle);
+    setOffPeak("No");
+    setPolicy(emptyPolicy);
+  };
+
+  if (page === "consent") {
     return (
       <SingpassConsent
-        onCancel={() => setStep("landing")}
+        onCancel={() => history.back()}
         onAgree={() => {
-          // 8543:25408: SKC5500A preselected; the user still has to pick it.
-          setRegNo("SKC5500A");
-          setStep("found");
+          // One vehicle per customer in this prototype: Singpass fills it in straight away.
+          setSingpassFilled(true);
+          go("quote");
         }}
+      />
+    );
+  }
+
+  if (page === "quote" || page === "manual") {
+    return (
+      <QuoteForm
+        mode={page === "manual" ? "manual" : singpassFilled ? "singpass" : "cleared"}
+        vehicle={vehicle}
+        offPeak={offPeak}
+        policy={policy}
+        onVehicle={(v) => setVehicle((prev) => ({ ...prev, ...v }))}
+        onOffPeak={setOffPeak}
+        onPolicy={(p) => setPolicy((prev) => applyPolicy(prev, p))}
+        onClearForm={() => {
+          // The autofilled vehicle details go away; the card switches to Retrieve with Singpass.
+          setSingpassFilled(false);
+          setVehicle(emptyVehicle);
+        }}
+        onRetrieve={() => go("consent")}
       />
     );
   }
 
   return (
-    <QuoteForm
-      step={step}
-      regNo={regNo}
-      offPeak={offPeak}
-      power={power}
-      policy={policy}
-      onPickVehicle={(r) => {
-        setRegNo(r);
-        setStep("picked");
+    <Landing
+      onRetrieve={() => {
+        resetForm();
+        go("consent");
       }}
-      // Row 3 (8641:3667 onwards) starts when the user moves on to the policy details.
-      onStartPolicy={() => setStep((s) => (s === "picked" ? "details" : s))}
-      onOffPeak={setOffPeak}
-      onPower={setPower}
-      onPolicy={(p) => setPolicy((prev) => applyPolicy(prev, p))}
-      // Clear Form takes the form back to how it looked right after Singpass (8543:25408).
-      onClearForm={() => {
-        setRegNo("SKC5500A");
-        setStep("found");
-        setPolicy(emptyPolicy);
-        setOffPeak("No");
-        setPower("");
+      onFillManually={() => {
+        resetForm();
+        setSingpassFilled(false);
+        go("manual");
       }}
     />
   );

@@ -1,8 +1,8 @@
 // Icons are exported from the Figma nodes; logo, hero photo, Singpass logo and consent list were supplied by the design team.
 import logo from "./assets/logo.svg";
 import hero from "./assets/hero.jpg";
-import singpassLogo from "./assets/singpass-logo.svg";
-import consentList from "./assets/consent-list.svg";
+import singpassLogo from "./assets/singpass-logo.png";
+import consentList from "./assets/consent-list.png";
 import retrieveWithSingpass from "./assets/retrieve-with-singpass.svg";
 import retrieveWithSingpass300 from "./assets/retrieve-with-singpass-300.svg";
 import line124 from "./assets/line-124.svg";

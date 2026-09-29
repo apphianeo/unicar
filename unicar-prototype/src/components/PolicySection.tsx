@@ -1,5 +1,5 @@
 import { assets } from "../assets";
-import { claimsOptions, experienceOptions, ncdOptions, promoCode } from "../data/mock";
+import { claimsOptions, experienceOptions, ncdOptions, promoCode, tooltips } from "../data/mock";
 import { Button, TextButton } from "./Button";
 import { DateField, Divider, Dropdown, parseDate, PromoField, RadioGroup } from "./Form";
 
@@ -47,7 +47,7 @@ export function PolicySection({
         <DateField
           label="Insurance end date"
           info
-          tooltip="You may select a minimum of 9 months and a maximum of 18 months for your period of insurance."
+          tooltip={tooltips.endDate}
           value={policy.endDate}
           rangeStart={policy.startDate}
           minDate={endMin}
@@ -60,6 +60,7 @@ export function PolicySection({
         <Dropdown
           label="No claims discount (NCD)"
           info
+          tooltip={tooltips.ncd}
           value={policy.ncd}
           options={ncdOptions}
           onOpen={onStartPolicy}
@@ -77,6 +78,7 @@ export function PolicySection({
         <Dropdown
           label="Claims made in the last 3 years"
           info
+          tooltip={tooltips.claims}
           value={policy.claims}
           options={claimsOptions}
           onOpen={onStartPolicy}
@@ -84,6 +86,7 @@ export function PolicySection({
         />
         <RadioGroup
           label="I drive at work"
+          tooltip={tooltips.driveAtWork}
           value={policy.driveAtWork}
           onChange={(driveAtWork) => onPolicy({ driveAtWork })}
           className="min-w-px flex-[1_0_0] self-stretch"

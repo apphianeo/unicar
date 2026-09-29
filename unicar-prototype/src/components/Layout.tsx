@@ -65,6 +65,8 @@ export function PageShell({ children }: { children: ReactNode }) {
           alt=""
           className="pointer-events-none absolute left-0 top-0 h-[50vh] w-full object-cover object-center"
         />
+        {/* Black at 20% over the photo (8517:2744). */}
+        <div className="pointer-events-none absolute left-0 top-0 h-[50vh] w-full bg-black/20" />
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 top-[50vh] rounded-t-[12px] bg-primary-gradient-light" />
         <div className="relative flex w-full max-w-[1000px] flex-col items-start gap-[32px]">
           <LandingBanner />
