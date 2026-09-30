@@ -26,12 +26,14 @@ browser's Back and Forward buttons work.
 | `#addons` | `8394:12743`, `8394:37745`, `8394:38117`, `8398:39153` | Three tabs. Each switch turns its card to the Selected variant; Policy excess (price then shows the chosen amount) and Additional named drivers show their dropdown, which floats over the cards below and makes room above the buttons. The price summary lists the chosen add-ons with an amount on the right. The button reads **Skip**, or **Next: Driver Details** once an add-on is on. |
 | `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. Date of birth uses the purchase-flow picker: month and year grids from the header, no future dates. |
 | `#review` | `8394:15430`, `8394:15715` | Everything entered so far, with Edit links back to Driver Details. **Confirm & Pay** works once the declaration is ticked. The 2C2P / Visa OTP screen in `8697:12426` is left out. |
-| `#confirmation` | `8600:17327` | Thank-you page; its buttons and "here" have no destination in the design. |
+| `#confirmation` | `8600:17327` | Thank-you page with LottieFiles' free "Successful" animation (played once) in the success slot; its buttons and "here" have no destination in the design. |
 
 The summary bar shows the car and the policy dates entered on the form (the Figma values if left empty); its **Edit**
-and "Your Car" **Edit** go back to the form, "Your Plan" **Edit** to Select Plan. Price summary: subtotal = plan + paid add-ons
-(updated live; policy excess adds nothing, named drivers 3 and 4 add S$50 / S$100), then 60% promo, then 9% GST (this
-reproduces the Figma numbers for Essential). "Add-On(s)" **Edit** turns blue once an add-on is chosen and goes to Add-Ons.
+and "Your Car" **Edit** go back to the form, "Your Plan" **Edit** to Select Plan. Prices are estimates (UniCar premiums are quoted per
+car and driver and aren't published), all incl. GST: plans S$2,180 / 1,690 / 1,150 / 820 before the 60% promo; add-ons
+NCD protector S$168, New for old S$120, Accessories S$65, Loss of use S$58, 24h breakdown S$38, drivers 3 and 4 +S$50 /
++S$100; a higher excess lowers the premium (S$1000 –S$34 … S$2100 –S$95). Price summary: subtotal = plan + add-ons
+(updated live), minus the 60% promo = total. "Add-On(s)" **Edit** turns blue once an add-on is chosen and goes to Add-Ons.
 *policy wording* on Select Plan opens the UniCar policy PDF in a new tab.
 
 Every (i) icon opens a popover on hover, focus or tap. The end-date text is from `8644:11047`; the others are placeholder

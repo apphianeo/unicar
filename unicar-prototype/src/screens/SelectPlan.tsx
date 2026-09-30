@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle } from "../components/Flow";
 import { InfoAlert } from "../components/Form";
-import { benefits, geographicalArea, policyWordingUrl, planDiscountBadge, plans, type PlanId } from "../data/mock";
+import { benefits, geographicalArea, money, policyWordingUrl, promoRate, planDiscountBadge, plans, type PlanId } from "../data/mock";
 
 // Heights of the benefit rows (8394:14876 …): "Own damage - the motor vehicle" wraps to two lines.
 const rowHeights = ["h-[21px]", "h-[42px]", "h-[21px]", "h-[21px]", "h-[21px]"];
@@ -70,10 +70,10 @@ export default function SelectPlan({
                         )}
                         <p className="w-full text-[20px] font-semibold leading-[1.2] text-text-primary">{plan.name}</p>
                         <div className="flex w-full flex-col items-start justify-end gap-[4px]">
-                          <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">{plan.price}</p>
+                          <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">{money(plan.list * (1 - promoRate))}</p>
                           <div className="flex items-center gap-[8px]">
                             <p className="whitespace-nowrap text-[12px] font-medium leading-[1.4] text-text-secondary line-through">
-                              {plan.was}
+                              {money(plan.list)}
                             </p>
                             <GreenBadge>{planDiscountBadge}</GreenBadge>
                           </div>

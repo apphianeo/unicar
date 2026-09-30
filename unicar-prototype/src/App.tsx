@@ -6,11 +6,11 @@ import {
   addOnCost,
   addOnCount,
   addOns,
-  gstRate,
   plans,
   powerByMake,
   singpassApplicant,
   promoCode,
+  money,
   promoRate,
   singpassVehicle,
   type AddOnTab,
@@ -48,17 +48,19 @@ function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
   return next;
 }
 
-const money = (n: number) => `S$${n.toFixed(2)}`;
 
 // A chosen add-on in the price summary: the right column is always an amount (8398:39153), e.g.
 // "Policy excess  S$600.00", "Additional named drivers (x1)  Free".
 function addOnRow(id: (typeof addOns)[number]["id"], title: string, s: AddOnState) {
-  if (id === "excess") return { label: title, value: s.excess.replace(" (Default)", "") };
+  if (id === "excess") {
+    const cost = addOnCost(id, s.drivers, s.excess);
+    return { label: `${title} (${s.excess.replace(" (Default)", "")})`, value: money(cost) };
+  }
   if (id === "drivers") {
     const cost = addOnCost(id, s.drivers);
     return { label: `${title} (x${addOnCount(s.drivers)})`, value: cost ? money(cost) : "Free" };
   }
-  return { label: title, value: money(addOnCost(id, s.drivers)) };
+  return { label: title, value: money(addOnCost(id, s.drivers, s.excess)) };
 }
 
 export default function App() {
@@ -108,7 +110,7 @@ export default function App() {
   const picked = addOns.filter((a) => addOnState.selected.includes(a.id));
   // Subtotal: the plan plus every paid add-on, updated as add-ons are switched on and off.
   const subtotal =
-    parseFloat(chosenPlan.price.replace("S$", "")) + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers), 0);
+    chosenPlan.list + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers, addOnState.excess), 0);
   const chosenAddOns = picked.map((a) => addOnRow(a.id, a.title, addOnState));
   const driverCount = addOnState.selected.includes("drivers") ? parseInt(addOnState.drivers, 10) : 0;
 
@@ -124,11 +126,10 @@ export default function App() {
             ]
           : undefined
       }
-      plan={{ label: chosenPlan.name, value: chosenPlan.price }}
+      plan={{ label: chosenPlan.name, value: money(chosenPlan.list) }}
       addOns={chosenAddOns}
       subtotal={subtotal}
       promoRate={promoRate}
-      gstRate={gstRate}
       promoCode={promoCode}
       onEditCar={() => go(formPage)}
       onEditPlan={() => go("plan")}

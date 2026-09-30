@@ -1,4 +1,4 @@
-import { assets } from "../assets";
+import { SuccessAnimation } from "../components/SuccessAnimation";
 import { Button } from "../components/Button";
 import { FooterShort, Header } from "../components/Layout";
 
@@ -10,11 +10,9 @@ export default function Confirmation() {
       <Header />
       <main className="flex w-full flex-[1_0_auto] flex-col items-center gap-[24px] px-[32px] py-[60px]">
         <div className="flex w-full max-w-[1200px] flex-col items-center gap-[24px]">
-          {/* Still frame of the success animation used in the design. */}
-          <div className="relative size-[120px] shrink-0 overflow-hidden rounded-[92.308px]">
-            <img src={assets.success} alt="" width={120} height={120} className="block size-[120px]" />
-          </div>
-          <div className="flex w-full flex-col items-center gap-[16px] text-text-primary">
+          <SuccessAnimation />
+          {/* Text sits above the animation's burst, which spills past the 120px slot. */}
+          <div className="relative z-10 flex w-full flex-col items-center gap-[16px] text-text-primary">
             <p className="whitespace-nowrap text-[20px] font-semibold leading-[1.2]">Thank you for your purchase, you’re ready to go.</p>
             <p className="w-full text-center text-[16px] font-normal leading-[1.5]">
               Thank you for insuring with United Overseas Insurance. Your Certificate of Insurance DHOF140000802599 will be
@@ -22,7 +20,7 @@ export default function Confirmation() {
               <span className="text-primary-sureblue underline">here</span>.
             </p>
           </div>
-          <div className="flex w-full flex-col items-center justify-center gap-[16px]">
+          <div className="relative z-10 flex w-full flex-col items-center justify-center gap-[16px]">
             <Button variant="primary" compact>
               Log In Customer Portal
             </Button>

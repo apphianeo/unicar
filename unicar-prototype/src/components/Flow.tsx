@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { assets } from "../assets";
+import { money } from "../data/mock";
 import { Button } from "./Button";
 import { FooterShort, Header } from "./Layout";
 
@@ -171,7 +172,6 @@ export function GreenBadge({ children }: { children: ReactNode }) {
   );
 }
 
-const money = (n: number) => `S$${n.toFixed(2)}`;
 
 type SummaryRow = { label: string; value: string };
 
@@ -184,7 +184,6 @@ export function PriceSummary({
   addOns,
   subtotal,
   promoRate,
-  gstRate,
   promoCode,
   onEditCar,
   onEditPlan,
@@ -196,7 +195,6 @@ export function PriceSummary({
   addOns: SummaryRow[];
   subtotal: number;
   promoRate: number;
-  gstRate: number;
   promoCode: string;
   onEditCar?: () => void;
   onEditPlan: () => void;
@@ -204,8 +202,9 @@ export function PriceSummary({
 }) {
   const driver = variant === "driver";
   const discount = Math.round(subtotal * promoRate * 100) / 100;
-  const total = Math.round((subtotal - discount) * (1 + gstRate) * 100) / 100;
-  const was = Math.round(subtotal * (1 + gstRate) * 100) / 100;
+  // Prices already include GST.
+  const total = Math.round((subtotal - discount) * 100) / 100;
+  const was = subtotal;
   const heading = "whitespace-nowrap text-[14px] font-semibold leading-[1.5] text-text-primary";
   const rowLabel = "min-w-px flex-[1_0_0] text-[14px] font-normal leading-[1.5] text-text-secondary";
   const rowValue = "whitespace-nowrap text-[14px] font-medium leading-[1.5] text-text-primary";
@@ -288,7 +287,7 @@ export function PriceSummary({
                   <img src={assets.icClose} alt="" width={16} height={16} className="size-[16px]" />
                 </div>
               </div>
-              <p className="whitespace-nowrap text-[14px] font-medium leading-[1.5] text-status-success">–{money(discount)}</p>
+              <p className="whitespace-nowrap text-[14px] font-medium leading-[1.5] text-status-success">{money(-discount)}</p>
             </div>
           </div>
           {line}
