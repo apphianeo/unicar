@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle } from "../components/Flow";
 import { InfoAlert } from "../components/Form";
-import { benefits, geographicalArea, planDiscountBadge, plans, type PlanId } from "../data/mock";
+import { benefits, geographicalArea, policyWordingUrl, planDiscountBadge, plans, type PlanId } from "../data/mock";
 
 // Heights of the benefit rows (8394:14876 …): "Own damage - the motor vehicle" wraps to two lines.
 const rowHeights = ["h-[21px]", "h-[42px]", "h-[21px]", "h-[21px]", "h-[21px]"];
@@ -118,7 +118,7 @@ export default function SelectPlan({
 
           <InfoAlert>{geographicalArea}</InfoAlert>
 
-          {/* View Plan Comparison and policy wording have no destination in the design, so they are inert. */}
+          {/* View Plan Comparison has no destination in the design, so it is inert. */}
           <div className="flex w-full flex-col items-start gap-[8px]">
             <div className="flex h-[32px] items-center gap-[8px] rounded-[12px]">
               <p className="whitespace-nowrap text-center text-[14px] font-medium leading-[1.5] text-primary-sureblue">
@@ -127,7 +127,11 @@ export default function SelectPlan({
               <img src={assets.icForward} alt="" width={24} height={24} className="size-[24px]" />
             </div>
             <p className="flex h-[32px] items-center text-[14px] font-normal leading-[1.5] text-text-secondary">
-              For full summary, please refer to&nbsp;<span className="text-primary-sureblue">policy wording</span>.
+              For full summary, please refer to&nbsp;
+              <a href={policyWordingUrl} target="_blank" rel="noopener noreferrer" className="text-primary-sureblue">
+                policy wording
+              </a>
+              .
             </p>
           </div>
         </div>

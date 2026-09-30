@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle, Switch } from "../components/Flow";
 import { Dropdown } from "../components/Form";
@@ -38,8 +38,22 @@ export default function AddOns({
   onBack: () => void;
   onNext: () => void;
 }) {
-  const toggle = (id: AddOnId, on: boolean) =>
+  // Which card's dropdown is open, and the extra room below the cards so its menu ends above the buttons (8398:39153).
+  const [openMenu, setOpenMenu] = useState<AddOnId | null>(null);
+  const [room, setRoom] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    const menu = list?.querySelector("[data-dropdown-menu]");
+    if (!list || !menu || !openMenu) return setRoom(0);
+    setRoom(Math.max(0, Math.ceil(menu.getBoundingClientRect().bottom - (list.getBoundingClientRect().bottom - room))));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openMenu, tab]);
+
+  const toggle = (id: AddOnId, on: boolean) => {
+    if (!on && openMenu === id) setOpenMenu(null);
     onChange({ selected: on ? [...state.selected, id] : state.selected.filter((s) => s !== id) });
+  };
 
   return (
     <FlowShell step={2} summary={summary}>
@@ -76,15 +90,19 @@ export default function AddOns({
                   );
                 })}
               </div>
-              <div className="flex w-full flex-col items-start gap-[24px]">
+              <div ref={listRef} className="flex w-full flex-col items-start gap-[24px]" style={{ paddingBottom: room }}>
                 {addOns
                   .filter((a) => a.tab === tab)
-                  .map((a) => {
+                  .map((a, i, shown) => {
                     const on = state.selected.includes(a.id);
+                    // Selected Policy excess shows the chosen amount instead of "From S$600.00" (8398:39153).
+                    const price = on && a.id === "excess" ? state.excess.replace(" (Default)", "") : a.price;
                     return (
                       <div
                         key={a.id}
-                        className={`flex w-full flex-col items-start justify-center rounded-[12px] border border-solid bg-bg-white p-[16px] drop-shadow-overlay ${on ? "border-primary-sureblue" : "border-transparent"}`}
+                        // Earlier cards sit above later ones, so an open menu floats over the cards below it.
+                        style={{ zIndex: shown.length - i }}
+                        className={`relative flex w-full flex-col items-start justify-center rounded-[12px] border border-solid bg-bg-white p-[16px] drop-shadow-overlay ${on ? "border-primary-sureblue" : "border-transparent"}`}
                       >
                         <div className="flex w-full flex-col items-start gap-[12px]">
                           <div className="flex w-full items-center gap-[24px]">
@@ -95,7 +113,7 @@ export default function AddOns({
                               <p className="min-w-px flex-[1_0_0] text-[18px] font-semibold leading-[1.5] text-text-primary">{a.title}</p>
                             </div>
                             <div className="flex items-center justify-end gap-[12px]">
-                              <p className="whitespace-nowrap text-[16px] font-semibold leading-[1.5] text-text-primary">{a.price}</p>
+                              <p className="whitespace-nowrap text-[16px] font-semibold leading-[1.5] text-text-primary">{price}</p>
                               <Switch on={on} label={a.title} onChange={(v) => toggle(a.id, v)} />
                             </div>
                           </div>
@@ -110,6 +128,7 @@ export default function AddOns({
                                 value={a.id === "excess" ? state.excess : state.drivers}
                                 options={a.id === "excess" ? excessOptions : namedDriverOptions}
                                 onSelect={(v) => onChange(a.id === "excess" ? { excess: v } : { drivers: v })}
+                                onOpenChange={(open) => setOpenMenu(open ? a.id : null)}
                               />
                             </div>
                           )}
@@ -119,8 +138,8 @@ export default function AddOns({
                   })}
               </div>
             </div>
-            {/* The frames only show "Skip" (nothing selected); the button keeps that label. */}
-            <FlowActions next="Skip" onBack={onBack} onNext={onNext} />
+            {/* "Skip" with nothing selected (8394:12743), "Next: Driver Details" once an add-on is on (8398:39153). */}
+            <FlowActions next={state.selected.length ? "Next: Driver Details" : "Skip"} onBack={onBack} onNext={onNext} />
           </div>
           {priceSummary}
         </div>

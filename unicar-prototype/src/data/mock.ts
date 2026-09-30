@@ -56,6 +56,7 @@ export const plans: { id: PlanId; name: string; price: string; was: string; cove
   { id: "tpo", name: "Third Party Only", price: "S$22.00", was: "S$55.00", covers: [false, false, true, true, false] },
 ];
 export const planDiscountBadge = "–60%";
+export const policyWordingUrl = "https://www.uoi.com.sg/assets/web-resources/uoi/pdfs/insurance/unicar-motor-insurance-policy.pdf";
 export const geographicalArea =
   "Geographical area includes Singapore, West Malaysia, Southern Thailand (up to 80km from West Malaysia), Straits between Singapore and Tanjong Belungkor (Johor)";
 
@@ -125,8 +126,18 @@ export const addOns: { id: AddOnId; tab: AddOnTab; title: string; price: string;
 export const excessOptions = ["S$600.00 (Default)", "S$1000.00", "S$1100.00", "S$1350.00", "S$1600.00", "S$2100.00"];
 export const namedDriverOptions = ["1 (free)", "2 (free)", "3 (+S$50.00)", "4 (+S$100.00)"];
 
-// Promo applied in every price summary (8543:24280): 60% off the plan, then 9% GST. With Essential this gives the
-// drawn figures (S$51.40, –S$30.84, S$22.41, was S$56.03).
+// What each add-on adds to the subtotal. Policy excess is the amount paid per claim, not a premium, so it adds
+// nothing (8398:39153 keeps the subtotal at the plan price with S$600.00 excess). Named drivers cost what the
+// dropdown says.
+export const addOnCost = (id: AddOnId, drivers: string): number => {
+  if (id === "excess") return 0;
+  if (id === "drivers") return parseFloat(/\+S\$([\d.]+)/.exec(drivers)?.[1] ?? "0");
+  return parseFloat(addOns.find((a) => a.id === id)!.price.replace("S$", ""));
+};
+export const addOnCount = (drivers: string) => parseInt(drivers, 10);
+
+// Promo applied in every price summary (8543:24280): 60% off the subtotal (plan plus paid add-ons), then 9% GST.
+// With Essential and no paid add-ons this gives the drawn figures (S$51.40, –S$30.84, S$22.41, was S$56.03).
 export const promoRate = 0.6;
 export const gstRate = 0.09;
 

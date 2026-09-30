@@ -35,8 +35,10 @@ export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo;
                 <div
                   className={`flex size-[24px] shrink-0 items-center justify-center rounded-full ${state === "active" ? "bg-primary-sureblue" : "bg-bg-whitewashed"}`}
                 >
+                  {/* leading-none puts the digit's visual centre on the circle's centre, as in 8391:11587; at 1.4 the
+                      Noto Sans digits sit low. */}
                   <p
-                    className={`text-center text-[12px] leading-[1.4] ${state === "active" ? "font-medium text-white" : "font-normal text-text-tertiary"}`}
+                    className={`text-center text-[12px] leading-none ${state === "active" ? "font-medium text-white" : "font-normal text-text-tertiary"}`}
                   >
                     {n}
                   </p>
@@ -185,6 +187,7 @@ export function PriceSummary({
   promoCode,
   onEditCar,
   onEditPlan,
+  onEditAddOns,
 }: {
   variant: "addons" | "driver";
   car?: SummaryRow[];
@@ -196,6 +199,7 @@ export function PriceSummary({
   promoCode: string;
   onEditCar?: () => void;
   onEditPlan: () => void;
+  onEditAddOns: () => void;
 }) {
   const driver = variant === "driver";
   const discount = Math.round(subtotal * promoRate * 100) / 100;
@@ -215,7 +219,7 @@ export function PriceSummary({
             <span className="whitespace-nowrap text-center text-[14px] font-medium leading-[1.5] text-primary-sureblue">Edit</span>
           </button>
         ) : (
-          // The add-on Edit is greyed out in both frames.
+          // Add-on Edit is greyed out until an add-on is chosen (8394:12743 vs 8398:39153).
           <p className="whitespace-nowrap text-center text-[14px] font-medium leading-[1.5] text-text-disabled">Edit</p>
         )}
       </div>
@@ -253,6 +257,7 @@ export function PriceSummary({
           <Section title={driver ? "Your plan" : "Your Plan"} onEdit={onEditPlan} rows={rows([plan])} gap="gap-[12px]" />
           <Section
             title={driver ? "Add-on(s)" : "Add-On(s)"}
+            onEdit={addOns.length ? onEditAddOns : undefined}
             rows={
               addOns.length ? (
                 rows(addOns)

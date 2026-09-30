@@ -2,7 +2,18 @@ import { useEffect, useState } from "react";
 import { HeaderSummary, PriceSummary } from "./components/Flow";
 import { parseDate } from "./components/Form";
 import { emptyPolicy, endDateRange, type Policy } from "./components/PolicySection";
-import { addOns, gstRate, plans, promoCode, promoRate, singpassVehicle, type AddOnTab, type PlanId } from "./data/mock";
+import {
+  addOnCost,
+  addOnCount,
+  addOns,
+  gstRate,
+  plans,
+  promoCode,
+  promoRate,
+  singpassVehicle,
+  type AddOnTab,
+  type PlanId,
+} from "./data/mock";
 import AddOnsScreen, { type AddOnState } from "./screens/AddOns";
 import DriverDetails, { emptyExtraDriver, type ExtraDriver, type YesNo } from "./screens/DriverDetails";
 import Landing from "./screens/Landing";
@@ -33,11 +44,17 @@ function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
   return next;
 }
 
-// How a chosen add-on reads in the price summary (the Driver Details frame shows "S$600.00" and "1 (Free)").
-function addOnValue(id: string, s: AddOnState, price: string) {
-  if (id === "excess") return s.excess.replace(" (Default)", "");
-  if (id === "drivers") return s.drivers.replace("(free)", "(Free)");
-  return price;
+const money = (n: number) => `S$${n.toFixed(2)}`;
+
+// A chosen add-on in the price summary: the right column is always an amount (8398:39153), e.g.
+// "Policy excess  S$600.00", "Additional named drivers (x1)  Free".
+function addOnRow(id: (typeof addOns)[number]["id"], title: string, s: AddOnState) {
+  if (id === "excess") return { label: title, value: s.excess.replace(" (Default)", "") };
+  if (id === "drivers") {
+    const cost = addOnCost(id, s.drivers);
+    return { label: `${title} (x${addOnCount(s.drivers)})`, value: cost ? money(cost) : "Free" };
+  }
+  return { label: title, value: money(addOnCost(id, s.drivers)) };
 }
 
 export default function App() {
@@ -83,10 +100,11 @@ export default function App() {
   const period =
     policy.startDate && policy.endDate ? `${policy.startDate} - ${policy.endDate}` : "02/01/2026 - 01/01/2027";
   const chosenPlan = plans.find((p) => p.id === plan)!;
-  const subtotal = parseFloat(chosenPlan.price.replace("S$", ""));
-  const chosenAddOns = addOns
-    .filter((a) => addOnState.selected.includes(a.id))
-    .map((a) => ({ label: a.title, value: addOnValue(a.id, addOnState, a.price) }));
+  const picked = addOns.filter((a) => addOnState.selected.includes(a.id));
+  // Subtotal: the plan plus every paid add-on, updated as add-ons are switched on and off.
+  const subtotal =
+    parseFloat(chosenPlan.price.replace("S$", "")) + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers), 0);
+  const chosenAddOns = picked.map((a) => addOnRow(a.id, a.title, addOnState));
   const driverCount = addOnState.selected.includes("drivers") ? parseInt(addOnState.drivers, 10) : 0;
 
   const summary = <HeaderSummary make={make} period={period} onEdit={() => go(formPage)} />;
@@ -109,6 +127,7 @@ export default function App() {
       promoCode={promoCode}
       onEditCar={() => go(formPage)}
       onEditPlan={() => go("plan")}
+      onEditAddOns={() => go("addons")}
     />
   );
 

@@ -22,7 +22,8 @@ export function Popover({ children }: { children: ReactNode }) {
         alt=""
         width={8}
         height={16}
-        className="absolute left-[-8px] top-[calc(50%+0.5px)] h-[16px] w-[8px] -translate-y-1/2"
+        // The arrow's flat edge is at x=7.17 of its 8px box: 7px out, it meets the body with no seam in the shadow.
+        className="absolute left-[-7px] top-[calc(50%+0.5px)] h-[16px] w-[8px] -translate-y-1/2"
       />
     </span>
   );
@@ -99,6 +100,8 @@ type DropdownProps = {
   selectable?: string[];
   onSelect?: (value: string) => void;
   onOpen?: () => void;
+  // Told whenever the menu opens or closes.
+  onOpenChange?: (open: boolean) => void;
   // Closed chevron colour differs per slot in the frames (#6E6E6E or #949494).
   chevron?: ChevronTone;
 };
@@ -115,9 +118,14 @@ export function Dropdown({
   selectable,
   onSelect,
   onOpen,
+  onOpenChange,
   chevron = "default",
 }: DropdownProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
+    onOpenChange?.(v);
+  };
   const ref = useRef<HTMLDivElement>(null);
   const canOpen = !disabled && !!options?.length;
 
@@ -163,7 +171,10 @@ export function Dropdown({
         </button>
 
         {open && options && (
-          <div className="absolute left-0 top-[calc(100%+8px)] z-10 flex w-full items-start overflow-clip rounded-[8px] drop-shadow-overlay">
+          <div
+            data-dropdown-menu
+            className="absolute left-0 top-[calc(100%+8px)] z-10 flex w-full items-start overflow-clip rounded-[8px] drop-shadow-overlay"
+          >
             {/* Every menu is cut at the same fixed height (6 rows, 288px) and scrolls beyond it (8647:16348 slider). */}
             <div className="ds-scroll flex max-h-[288px] min-w-px flex-[1_0_0] flex-col items-start overflow-y-auto">
               {options.map((opt) => {
