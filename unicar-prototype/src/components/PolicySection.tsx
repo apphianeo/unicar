@@ -27,10 +27,12 @@ export function PolicySection({
   policy,
   onPolicy,
   onStartPolicy,
+  onCheckPrice,
 }: {
   policy: Policy;
   onPolicy: (p: Partial<Policy>) => void;
   onStartPolicy?: () => void;
+  onCheckPrice: () => void;
 }) {
   const { min: endMin, max: endMax } = endDateRange(policy.startDate);
   return (
@@ -98,8 +100,9 @@ export function PolicySection({
       <PromoField code={promoCode} />
       <TextButton icon={assets.icPlus}>Have an Agent ID?</TextButton>
     </div>
-    {/* The screen after Check Price isn't designed yet. */}
-    <Button variant="primary">Check Price</Button>
+    <Button variant="primary" onClick={onCheckPrice}>
+      Check Price
+    </Button>
     </>
   );
 }

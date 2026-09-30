@@ -17,12 +17,22 @@ export default {
         "status-info": "var(--status-color-status-info)",
         "statusbg-info": "var(--status-color-statusbg-info)",
         "status-success": "var(--status-color-status-success)",
+        "status-error": "var(--status-color-status-error)",
+        "bg-subtleoffwhite": "var(--background-color-bg-subtleoffwhite)",
+        "bg-muted": "var(--background-color-bg-muted)",
+        "badge-new": "var(--badge-green)",
+        "switch-off": "var(--primary-gray-300)",
+        "summary-chip": "var(--summary-chip-bg)",
         line: "var(--utility-color-line)",
       },
       backgroundImage: {
         // --primary-gradient-light from the UniTravel prototype
         "primary-gradient-light":
           "linear-gradient(90deg,rgba(0,94,184,.06) 0.62%,rgba(92,85,235,.06) 100%),linear-gradient(#fff,#fff)",
+        // Primary/color-primary-gradient: "Most popular" and promo badges
+        "primary-gradient": "linear-gradient(90deg,#005eb8 0.62%,#5c55eb 100%)",
+        // Add-on icon tile: Secondary/color-primary-bluebright-transparent (#3385E6 at 12% over white)
+        "bluebright-transparent": "linear-gradient(rgba(51,133,230,.12),rgba(51,133,230,.12)),linear-gradient(#fff,#fff)",
       },
       fontFamily: {
         sans: ['"Noto Sans"', "sans-serif"],
@@ -37,6 +47,8 @@ export default {
       boxShadow: {
         // effect-underline: INNER_SHADOW #00000017, y -1
         underline: "inset 0px -1px 0px 0px rgba(0,0,0,0.09)",
+        // Switch knob (8006:1151)
+        knob: "0px 2.222px 4.444px 0px rgba(39,39,39,0.1)",
       },
     },
   },

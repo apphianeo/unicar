@@ -35,6 +35,111 @@ export const tooltips = {
   endDate: "You may select a minimum of 9 months and a maximum of 18 months for your period of insurance.",
   ncd: "A discount on your premium for every consecutive year without a claim, up to 50%.",
   claims: "The number of motor insurance claims made under your name in the last 3 years.",
+  brandNew: "Select Yes if the vehicle is newly bought and has not been registered to a previous owner.",
   driveAtWork:
     "Select Yes if you use this vehicle for work other than travelling to and from your workplace, such as visiting clients or making deliveries.",
+};
+
+// Select Plan (8391:11581). Prices and ticks as drawn.
+export type PlanId = "preferred" | "essential" | "tpft" | "tpo";
+export const benefits = [
+  "Choice of workshop",
+  "Own damage - the motor vehicle",
+  "Third party liability",
+  "Other benefits",
+  "Excess for authorised driver(s)",
+];
+export const plans: { id: PlanId; name: string; price: string; was: string; covers: boolean[]; popular?: boolean }[] = [
+  { id: "preferred", name: "Preferred", price: "S$25.00", was: "S$62.50", covers: [true, true, true, true, true] },
+  { id: "essential", name: "Essential", price: "S$51.40", was: "S$128.50", covers: [false, true, true, true, true], popular: true },
+  { id: "tpft", name: "Third Party Fire & Theft", price: "S$32.00", was: "S$80.00", covers: [false, false, true, true, false] },
+  { id: "tpo", name: "Third Party Only", price: "S$22.00", was: "S$55.00", covers: [false, false, true, true, false] },
+];
+export const planDiscountBadge = "–60%";
+export const geographicalArea =
+  "Geographical area includes Singapore, West Malaysia, Southern Thailand (up to 80km from West Malaysia), Straits between Singapore and Tanjong Belungkor (Johor)";
+
+// Add-ons (component set 8535:21169), by tab (8394:12743, 8394:37745, 8394:38117).
+export type AddOnId = "ncd" | "excess" | "drivers" | "replacement" | "accessories" | "lossOfUse" | "breakdown";
+export const addOnTabs = ["Recommended", "Vehicle Maintenance", "Mobility & Roadside Services"] as const;
+export type AddOnTab = (typeof addOnTabs)[number];
+export const addOns: { id: AddOnId; tab: AddOnTab; title: string; price: string; description: string }[] = [
+  {
+    id: "ncd",
+    tab: "Recommended",
+    title: "No claim discount (NCD) protector",
+    price: "S$307.32",
+    description:
+      "Safeguard the No Claim Discount you have earned. Available when your NCD is 30% or above, this add-on keeps your discount intact at renewal even after a claim, so years of careful driving continue to reward you.",
+  },
+  {
+    id: "excess",
+    tab: "Recommended",
+    title: "Policy excess",
+    price: "From S$600.00",
+    description:
+      "Choose the excess that suits you. This is the amount you contribute towards each claim: select a higher excess to lower your premium, or a lower excess to reduce your out-of-pocket cost when you claim.",
+  },
+  {
+    id: "drivers",
+    tab: "Recommended",
+    title: "Additional named drivers",
+    price: "Free",
+    description:
+      "Share your car with confidence. Add family or friends as named drivers so they are fully covered behind the wheel, with your first two named drivers included at no extra cost.",
+  },
+  {
+    id: "replacement",
+    tab: "Vehicle Maintenance",
+    title: "New for old replacement",
+    price: "S$49.05",
+    description:
+      "Enjoy added peace of mind for your new vehicle. Should your car be stolen or declared a total loss within the eligible period, we will replace it with the same make and model rather than settle at its depreciated value.",
+  },
+  {
+    id: "accessories",
+    tab: "Vehicle Maintenance",
+    title: "Added accessories",
+    price: "S$49.05",
+    description:
+      "Extend your protection to the accessories that make your car your own. Non-standard fittings such as audio systems, rims and bodykits fall outside standard cover; this add-on safeguards them against loss or damage.",
+  },
+  {
+    id: "lossOfUse",
+    tab: "Mobility & Roadside Services",
+    title: "Loss of use",
+    price: "S$49.05",
+    description:
+      "Stay mobile while your car is being repaired after an accident. This add-on provides a daily transport allowance towards taxis or a rental vehicle, so your routine carries on with minimal disruption.",
+  },
+  {
+    id: "breakdown",
+    tab: "Mobility & Roadside Services",
+    title: "24 hours breakdown assistance",
+    price: "S$49.05",
+    description:
+      "Drive with confidence, knowing help is always within reach. Our 24 hour assistance covers towing, battery jump-starts, tyre changes and lockouts, whenever and wherever you need it.",
+  },
+];
+// Dropdowns inside the selected add-ons (8535:21158, 8535:21159).
+export const excessOptions = ["S$600.00 (Default)", "S$1000.00", "S$1100.00", "S$1350.00", "S$1600.00", "S$2100.00"];
+export const namedDriverOptions = ["1 (free)", "2 (free)", "3 (+S$50.00)", "4 (+S$100.00)"];
+
+// Promo applied in every price summary (8543:24280): 60% off the plan, then 9% GST. With Essential this gives the
+// drawn figures (S$51.40, –S$30.84, S$22.41, was S$56.03).
+export const promoRate = 0.6;
+export const gstRate = 0.09;
+
+// Applicant details and chassis number returned by Singpass (8394:15054).
+export const singpassApplicant = {
+  name: "Chris Wong",
+  dob: "05/01/1991",
+  nric: "S9111012B",
+  phoneCode: "+65",
+  phone: "9123 4567",
+  email: "chriswong@gmail.com",
+  postalCode: "612345",
+  address: "Blk 345 East Coast St 23",
+  unit: "#09-124",
+  chassis: "1HGCM82633A123456",
 };

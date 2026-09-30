@@ -29,7 +29,18 @@ export function Popover({ children }: { children: ReactNode }) {
 }
 
 // Input Header (284:2992 with info icon, 284:2998 without). The (i) opens its Popover on hover, focus or tap.
-export function InputHeader({ label, info, tooltip }: { label: string; info?: boolean; tooltip?: string }) {
+// Required fields (driver details 8394:15054) put a red * before the label.
+export function InputHeader({
+  label,
+  info,
+  tooltip,
+  required,
+}: {
+  label: string;
+  info?: boolean;
+  tooltip?: string;
+  required?: boolean;
+}) {
   const [hover, setHover] = useState(false);
   const [pinned, setPinned] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
@@ -45,7 +56,14 @@ export function InputHeader({ label, info, tooltip }: { label: string; info?: bo
 
   return (
     <div className="flex h-[21px] items-center gap-[8px]">
-      <p className="whitespace-nowrap text-[14px] font-normal leading-[1.5] text-text-primary">{label}</p>
+      {required ? (
+        <div className="flex items-center gap-[4px] whitespace-nowrap text-[14px] font-normal leading-[1.5]">
+          <p className="text-status-error">*</p>
+          <p className="text-text-primary">{label}</p>
+        </div>
+      ) : (
+        <p className="whitespace-nowrap text-[14px] font-normal leading-[1.5] text-text-primary">{label}</p>
+      )}
       {info && (
         <button
           ref={ref}
@@ -70,7 +88,8 @@ export function InputHeader({ label, info, tooltip }: { label: string; info?: bo
 type ChevronTone = "default" | "tertiary";
 
 type DropdownProps = {
-  label: string;
+  // Left out for the add-on dropdowns (8535:21160), which have no header.
+  label?: string;
   info?: boolean;
   tooltip?: string;
   value?: string;
@@ -128,7 +147,7 @@ export function Dropdown({
 
   return (
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
-      <InputHeader label={label} info={info} tooltip={tooltip} />
+      {label && <InputHeader label={label} info={info} tooltip={tooltip} />}
       <div className="relative w-full">
         <button
           type="button"
@@ -185,9 +204,11 @@ export function TextField({
   value,
   disabled,
   disabledTone = "disabled",
+  required,
   onChange,
 }: {
   label: string;
+  required?: boolean;
   placeholder: string;
   value: string;
   disabled?: boolean;
@@ -197,7 +218,7 @@ export function TextField({
 }) {
   return (
     <div className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
-      <InputHeader label={label} />
+      <InputHeader label={label} required={required} />
       <div className={`${fieldBox} ${disabled ? "bg-disabled-bg" : `bg-bg-white ${focusRing}`}`}>
         <input
           value={value}
@@ -337,12 +358,14 @@ export function DateField({
   rangeStart,
   minDate,
   maxDate,
+  required,
   onChange,
   onOpen,
 }: {
   label: string;
   info?: boolean;
   tooltip?: string;
+  required?: boolean;
   value: string;
   // For the end-date picker: the chosen start date, shown as the start of the range.
   rangeStart?: string;
@@ -366,7 +389,7 @@ export function DateField({
 
   return (
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
-      <InputHeader label={label} info={info} tooltip={tooltip} />
+      <InputHeader label={label} info={info} tooltip={tooltip} required={required} />
       <div className={`${fieldBox} bg-bg-white ${open ? openRing : ""}`} onClick={() => { onOpen?.(); setOpen(true); }}>
         <input
           value={value}
@@ -423,16 +446,19 @@ export function RadioGroup({
   onChange,
   className = "",
   tooltip,
+  info = true,
 }: {
   label: string;
   tooltip?: string;
+  // "Is your car under financing?" (8394:15054) has no (i).
+  info?: boolean;
   value: "Yes" | "No";
   onChange: (v: "Yes" | "No") => void;
   className?: string;
 }) {
   return (
     <div className={`flex flex-col items-start gap-[12px] ${className}`}>
-      <InputHeader label={label} info tooltip={tooltip} />
+      <InputHeader label={label} info={info} tooltip={tooltip} />
       <div className="flex min-h-px w-full flex-[1_0_0] items-center gap-[32px]">
         {(["Yes", "No"] as const).map((opt) => (
           <RadioItem key={opt} label={opt} selected={value === opt} onClick={() => onChange(opt)} />

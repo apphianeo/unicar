@@ -24,6 +24,25 @@ import popoverArrow from "./assets/popover-arrow.svg";
 import chevronLeft from "./assets/chevron-left.svg";
 import chevronRight from "./assets/chevron-right.svg";
 import sortDown from "./assets/sort-down.svg";
+import spinner from "./assets/spinner.svg";
+import car from "./assets/car.svg";
+import summaryCalendar from "./assets/summary-calendar.svg";
+import planTick from "./assets/plan-tick.svg";
+import planCross from "./assets/plan-cross.svg";
+import star from "./assets/star.svg";
+import icForward from "./assets/ic-forward.svg";
+import addonNcd from "./assets/addon-ncd.svg";
+import addonExcess from "./assets/addon-excess.svg";
+import addonDrivers from "./assets/addon-drivers.svg";
+import addonReplace from "./assets/addon-replace.svg";
+import addonAccessories from "./assets/addon-accessories.svg";
+import addonLoss from "./assets/addon-loss.svg";
+import addonBreakdown from "./assets/addon-breakdown.svg";
+import stepDone from "./assets/step-done.svg";
+import stepTailDone from "./assets/step-tail-done.svg";
+import stepTailWaiting from "./assets/step-tail-waiting.svg";
+import icUp24 from "./assets/ic-up-24.svg";
+import calendarDisabled from "./assets/calendar-disabled.svg";
 
 export const assets = {
   logo,
@@ -51,4 +70,23 @@ export const assets = {
   chevronLeft,
   chevronRight,
   sortDown,
+  spinner,
+  car,
+  summaryCalendar,
+  planTick,
+  planCross,
+  star,
+  icForward,
+  addonNcd,
+  addonExcess,
+  addonDrivers,
+  addonReplace,
+  addonAccessories,
+  addonLoss,
+  addonBreakdown,
+  stepDone,
+  stepTailDone,
+  stepTailWaiting,
+  icUp24,
+  calendarDisabled,
 };

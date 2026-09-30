@@ -23,9 +23,10 @@ type Props = {
   onPolicy: (p: Partial<Policy>) => void;
   onClearForm: () => void;
   onRetrieve: () => void;
+  onCheckPrice: () => void;
 };
 
-export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, onOffPeak, onPolicy, onClearForm, onRetrieve }: Props) {
+export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, onOffPeak, onPolicy, onClearForm, onRetrieve, onCheckPrice }: Props) {
   const filled = mode === "singpass";
   // In the manual state, picking a make fills in its power rating and locks it (8649:7800).
   const lockedPower = !filled && vehicle.make ? powerByMake[vehicle.make] : undefined;
@@ -84,7 +85,7 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
           />
         </div>
       </div>
-      <PolicySection policy={policy} onPolicy={onPolicy} />
+      <PolicySection policy={policy} onPolicy={onPolicy} onCheckPrice={onCheckPrice} />
     </div>
   );
 

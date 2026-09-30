@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
 import { assets } from "../assets";
 
-// Header (8383:5192)
-export function Header() {
+// Header (8383:5192). The purchase steps put the stepper in the middle (8391:11774).
+export function Header({ center }: { center?: ReactNode }) {
   return (
     <header className="relative flex w-full flex-col items-center bg-bg-white px-[24px] py-[12px] shadow-underline">
       <div className="flex w-full items-center justify-between">
         <div className="flex h-[30px] w-[124px] flex-col items-start">
           <img src={assets.logo} alt="UOI" className="h-[30px] w-[60px] object-contain" />
         </div>
+        {center}
         {/* Need Assistance? has no destination in the design, so it is inert. */}
         <div className="flex h-[32px] items-center gap-[4px]">
           <img src={assets.questionMark} alt="" width={20} height={20} className="size-[20px]" />

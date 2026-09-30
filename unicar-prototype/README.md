@@ -11,15 +11,24 @@ npm run build:preview   # one self-contained dist-preview/index.html for sharing
 ```
 
 ## Flow
-Each page has its own URL hash (`#consent`, `#quote`, `#manual`), so the browser's Back and Forward buttons work.
+Each page has its own URL hash (`#consent`, `#quote`, `#manual`, `#loading`, `#plan`, `#addons`, `#driver`), so the
+browser's Back and Forward buttons work.
 
 | Page | Figma | What happens |
 |---|---|---|
 | Landing | `8517:2744` | **Retrieve with Singpass** opens the consent; **Fill Manually** opens the manual form. |
 | `#consent` | `8525:3731` | **Cancel** goes back; **I Agree** fills in the (single) vehicle and opens the quote form. |
 | `#quote` | `8641:3667` … | Singpass card with **Clear Form** stays on top; vehicle details are filled and locked; the user fills the policy details. |
-| `#quote` after Clear Form | `8642:19917` | Vehicle details are emptied and keyed in manually; the card offers **Retrieve with Singpass**, which goes through consent again. |
+| `#quote` after Clear Form | `8642:19917` | Every field (vehicle, off-peak, policy details) is emptied; the card offers **Retrieve with Singpass**, which goes through consent again. |
 | `#manual` | `8636:3287` … | No card; vehicle details keyed in (make/model and year from the options drawn in Figma; AION ES ELECTRIC fills power 100 and locks it). |
+| `#loading` | `8391:11773` | After **Check Price**: spinner for 2 seconds, then Select Plan (the loading page is skipped by Back). |
+| `#plan` | `8391:11581` | Essential is selected by default; **Select** moves the selection and the column highlight. **Next: Add-Ons**. |
+| `#addons` | `8394:12743`, `8394:37745`, `8394:38117` | Three tabs. Each switch turns its card to the Selected variant; Policy excess and Additional named drivers show their dropdown. The price summary lists the chosen add-ons. **Skip** goes on. |
+| `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. |
+
+The summary bar shows the car and the policy dates entered on the form (the Figma values if left empty); its **Edit**
+and "Your Car" **Edit** go back to the form, "Your Plan" **Edit** to Select Plan. Price summary: plan price, 60% promo,
+then 9% GST (this reproduces the Figma numbers for Essential); add-on prices are not added, as no frame shows that.
 
 Every (i) icon opens a popover on hover, focus or tap. The end-date text is from `8644:11047`; the others are placeholder
 definitions (`src/data/mock.ts`). Dropdown menus all stop at 6 rows (288px) and scroll beyond that.
@@ -44,5 +53,7 @@ the arrows change the month, and picking a day fills `DD/MM/YYYY`. The end-date 
 The month and year carets have no designed menu, so they are labels only.
 
 ## Not in the design, so left inert or empty
-- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, and *Check Price* (next flow).
+- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, *Save Draft*, *View Plan Comparison*,
+  *policy wording*, *View coverage details*, the discount chip's ✕, the section chevrons on Driver Details, and
+  *Next: Review & Pay* (next flow).
 - Text inputs use the Dropdown "focused" look (blue border with a 3px ring) when focused.
