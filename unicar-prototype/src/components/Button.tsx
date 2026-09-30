@@ -5,10 +5,13 @@ export function Button({
   variant,
   children,
   onClick,
+  compact,
 }: {
   variant: "primary" | "secondary";
   children: ReactNode;
   onClick?: () => void;
+  // 24px side padding (confirmation 8600:17436) instead of 32px.
+  compact?: boolean;
 }) {
   const look =
     variant === "primary"
@@ -18,7 +21,7 @@ export function Button({
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-[52px] shrink-0 cursor-pointer items-center justify-center rounded-[8px] px-[32px] py-[14px] ${look}`}
+      className={`flex h-[52px] shrink-0 cursor-pointer items-center justify-center rounded-[8px] ${compact ? "px-[24px]" : "px-[32px]"} py-[14px] ${look}`}
     >
       <span className="whitespace-nowrap text-[16px] font-medium leading-[1.5]">{children}</span>
     </button>

@@ -13,9 +13,10 @@ const lockedBox =
 const lockedText = "min-w-px flex-[1_0_0] text-[16px] font-normal leading-[1.5] text-text-disabled";
 
 // Driver details section card (8394:15060 …). The ic-up in the header has no collapsed state in the design, so it is inert.
-function Section({ title, children }: { title: string; children: ReactNode }) {
+// Earlier cards sit above later ones (z), so an open calendar or menu floats over the cards below it.
+function Section({ title, z, children }: { title: string; z: number; children: ReactNode }) {
   return (
-    <section className="flex w-full flex-col items-start gap-[24px] rounded-[12px] bg-bg-white p-[24px] drop-shadow-overlay">
+    <section style={{ zIndex: z }} className="relative flex w-full flex-col items-start gap-[24px] rounded-[12px] bg-bg-white p-[24px] drop-shadow-overlay">
       <div className="flex w-full items-center justify-between">
         <p className="whitespace-nowrap text-[20px] font-semibold leading-[1.2] text-text-primary">{title}</p>
         <img src={assets.icUp24} alt="" width={24} height={24} className="size-[24px] shrink-0" />
@@ -27,6 +28,10 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 const Row = ({ children }: { children: ReactNode }) => <div className="flex w-full items-start gap-[24px]">{children}</div>;
 const half = "w-[calc(50%-12px)] shrink-0";
+
+// Date of birth picker (purchase-flow DobField): no future dates; opens on January, 30 years back.
+const today = new Date(new Date().setHours(0, 0, 0, 0));
+const dobStart = new Date(today.getFullYear() - 30, 0, 1);
 
 // Enter Driver Details (8394:15054). Applicant details come from Singpass and are locked; one "Additional driver"
 // card per named driver chosen on the Add-Ons step.
@@ -44,6 +49,7 @@ export default function DriverDetails({
   financing,
   onFinancing,
   onBack,
+  onNext,
 }: {
   summary: ReactNode;
   priceSummary: ReactNode;
@@ -58,6 +64,7 @@ export default function DriverDetails({
   financing: YesNo;
   onFinancing: (v: YesNo) => void;
   onBack: () => void;
+  onNext: () => void;
 }) {
   const a = singpassApplicant;
   return (
@@ -69,7 +76,7 @@ export default function DriverDetails({
         <div className="flex w-full items-start gap-[24px]">
           <div className="flex min-w-px flex-[1_0_0] flex-col items-start justify-center gap-[60px]">
             <div className="flex w-full flex-col items-start gap-[24px]">
-              <Section title="Applicant/main driver details">
+              <Section title="Applicant/main driver details" z={extraDrivers.length + 2}>
                 <Row>
                   <TextField label="Full name as per NRIC/FIN" required placeholder="" value={a.name} disabled />
                   <div className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
@@ -114,7 +121,7 @@ export default function DriverDetails({
               </Section>
 
               {extraDrivers.map((d, i) => (
-                <Section key={i} title={`Additional driver ${i + 1} details`}>
+                <Section key={i} title={`Additional driver ${i + 1} details`} z={extraDrivers.length + 1 - i}>
                   <Row>
                     <TextField
                       label="Full name as per NRIC/FIN"
@@ -123,7 +130,15 @@ export default function DriverDetails({
                       value={d.name}
                       onChange={(name) => onExtraDriver(i, { name })}
                     />
-                    <DateField label="Date of birth" required value={d.dob} onChange={(dob) => onExtraDriver(i, { dob })} />
+                    <DateField
+                      label="Date of birth"
+                      required
+                      value={d.dob}
+                      pickMonthYear
+                      maxDate={today}
+                      initialMonth={dobStart}
+                      onChange={(dob) => onExtraDriver(i, { dob })}
+                    />
                   </Row>
                   <Row>
                     <TextField
@@ -152,7 +167,7 @@ export default function DriverDetails({
                 </Section>
               ))}
 
-              <Section title="Vehicle details">
+              <Section title="Vehicle details" z={0}>
                 <Row>
                   <Dropdown label="Vehicle make and model" info tooltip={tooltips.make} value={make} disabled />
                   <TextField label="Chassis number" placeholder="" value={a.chassis} disabled />
@@ -178,8 +193,7 @@ export default function DriverDetails({
                 </Row>
               </Section>
             </div>
-            {/* Review & Pay is not designed yet, so Next is inert. */}
-            <FlowActions next="Next: Review & Pay" onBack={onBack} />
+            <FlowActions next="Next: Review & Pay" onBack={onBack} onNext={onNext} />
           </div>
           {priceSummary}
         </div>

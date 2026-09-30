@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle, Switch } from "../components/Flow";
 import { Dropdown } from "../components/Form";
-import { addOns, addOnTabs, excessOptions, namedDriverOptions, type AddOnId, type AddOnTab } from "../data/mock";
+import { addOnCost, addOns, addOnTabs, excessOptions, namedDriverOptions, type AddOnId, type AddOnTab } from "../data/mock";
 
 const icons: Record<AddOnId, string> = {
   ncd: assets.addonNcd,
@@ -95,8 +95,15 @@ export default function AddOns({
                   .filter((a) => a.tab === tab)
                   .map((a, i, shown) => {
                     const on = state.selected.includes(a.id);
-                    // Selected Policy excess shows the chosen amount instead of "From S$600.00" (8398:39153).
-                    const price = on && a.id === "excess" ? state.excess.replace(" (Default)", "") : a.price;
+                    // Selected Policy excess shows the chosen amount instead of "From S$600.00" (8398:39153); named drivers
+                    // show what the chosen number costs ("Free" for 1 or 2).
+                    const driversCost = addOnCost("drivers", state.drivers);
+                    const price =
+                      on && a.id === "excess"
+                        ? state.excess.replace(" (Default)", "")
+                        : on && a.id === "drivers" && driversCost
+                          ? `S$${driversCost.toFixed(2)}`
+                          : a.price;
                     return (
                       <div
                         key={a.id}

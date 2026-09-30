@@ -43,6 +43,9 @@ import stepTailDone from "./assets/step-tail-done.svg";
 import stepTailWaiting from "./assets/step-tail-waiting.svg";
 import icUp24 from "./assets/ic-up-24.svg";
 import calendarDisabled from "./assets/calendar-disabled.svg";
+import checkboxOff from "./assets/checkbox-off.svg";
+import checkboxOn from "./assets/checkbox-on.svg";
+import success from "./assets/success.png";
 
 export const assets = {
   logo,
@@ -89,4 +92,7 @@ export const assets = {
   stepTailWaiting,
   icUp24,
   calendarDisabled,
+  checkboxOff,
+  checkboxOn,
+  success,
 };

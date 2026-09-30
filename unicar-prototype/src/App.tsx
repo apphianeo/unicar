@@ -8,6 +8,8 @@ import {
   addOns,
   gstRate,
   plans,
+  powerByMake,
+  singpassApplicant,
   promoCode,
   promoRate,
   singpassVehicle,
@@ -15,16 +17,18 @@ import {
   type PlanId,
 } from "./data/mock";
 import AddOnsScreen, { type AddOnState } from "./screens/AddOns";
+import Confirmation from "./screens/Confirmation";
 import DriverDetails, { emptyExtraDriver, type ExtraDriver, type YesNo } from "./screens/DriverDetails";
 import Landing from "./screens/Landing";
 import Loading from "./screens/Loading";
 import QuoteForm, { type ManualVehicle } from "./screens/QuoteForm";
+import Review from "./screens/Review";
 import SelectPlan from "./screens/SelectPlan";
 import SingpassConsent from "./screens/SingpassConsent";
 
 // Each page has its own URL hash, so the browser's Back and Forward buttons move through the flow.
-type Page = "landing" | "consent" | "quote" | "manual" | "loading" | "plan" | "addons" | "driver";
-const pages: Page[] = ["landing", "consent", "quote", "manual", "loading", "plan", "addons", "driver"];
+type Page = "landing" | "consent" | "quote" | "manual" | "loading" | "plan" | "addons" | "driver" | "review" | "confirmation";
+const pages: Page[] = ["landing", "consent", "quote", "manual", "loading", "plan", "addons", "driver", "review", "confirmation"];
 const pageFromHash = (): Page => {
   const h = window.location.hash.replace("#", "") as Page;
   return pages.includes(h) ? h : "landing";
@@ -72,6 +76,7 @@ export default function App() {
   const [extraDrivers, setExtraDrivers] = useState<ExtraDriver[]>([]);
   const [brandNew, setBrandNew] = useState<YesNo>("No");
   const [financing, setFinancing] = useState<YesNo>("No");
+  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     // Start at the landing page; a form page opened directly has no data to show.
@@ -203,6 +208,65 @@ export default function App() {
     );
   }
 
+  if (page === "review") {
+    const a = singpassApplicant;
+    const dash = (v?: string) => v || "-";
+    const power = singpassFilled ? singpassVehicle.power : (vehicle.make && powerByMake[vehicle.make]) || vehicle.power;
+    const year = singpassFilled ? singpassVehicle.year : vehicle.year;
+    return (
+      <Review
+        summary={summary}
+        priceSummary={priceSummary("driver")}
+        applicant={[
+          { label: "Full name as per NRIC/FIN", value: a.name },
+          { label: "Date of birth", value: a.dob },
+          { label: "NRIC/FIN", value: a.nric },
+          { label: "Mobile Number", value: `${a.phoneCode} ${a.phone}` },
+          { label: "Email address", value: a.email },
+          { label: "Postal code", value: a.postalCode },
+          { label: "Address", value: a.address },
+          { label: "Unit no.", value: a.unit },
+          { label: "Years of driving experience", value: dash(policy.experience) },
+          { label: "I drive at work", value: policy.driveAtWork },
+        ]}
+        extraDrivers={extraDrivers.map((d) => [
+          { label: "Full name as per NRIC/FIN", value: dash(d.name) },
+          { label: "Date of birth", value: dash(d.dob) },
+          { label: "NRIC/FIN", value: dash(d.nric) },
+          { label: "Years of driving experience", value: dash(d.experience) },
+          { label: "I drive at work", value: d.driveAtWork },
+        ])}
+        vehicle={[
+          { label: "Vehicle Make and Model", value: make },
+          { label: "Power Rating/Engine Capacity", value: dash(power) },
+          { label: "Year of Registration", value: dash(year) },
+          { label: "Off-peak Vehicle", value: offPeak },
+          { label: "Chassis number", value: a.chassis },
+          { label: "Brand new vehicle?", value: brandNew },
+          { label: "Vehicle registration number", value: regNo },
+          { label: "Is your car under financing?", value: financing },
+          // Driver Details has no fields for the finance company, so these show "-" when financed.
+          ...(financing === "Yes"
+            ? [
+                { label: "Hire Purchase / Finance Company", value: "-" },
+                { label: "Name of Hire Purchase / Finance Company", value: "-" },
+              ]
+            : []),
+          { label: "No Claims Discount (NCD)", value: dash(policy.ncd) },
+          { label: "How many claims have you made in the last 3 years?", value: dash(policy.claims) },
+        ]}
+        agreed={agreed}
+        onAgreed={setAgreed}
+        onEditDrivers={() => go("driver")}
+        onEditVehicle={() => go("driver")}
+        onBack={() => go("driver")}
+        onPay={() => go("confirmation")}
+      />
+    );
+  }
+
+  if (page === "confirmation") return <Confirmation />;
+
   if (page === "driver") {
     return (
       <DriverDetails
@@ -219,6 +283,7 @@ export default function App() {
         financing={financing}
         onFinancing={setFinancing}
         onBack={() => go("addons")}
+        onNext={() => go("review")}
       />
     );
   }

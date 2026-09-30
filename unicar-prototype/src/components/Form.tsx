@@ -262,12 +262,16 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const dayText = "whitespace-nowrap text-center text-[14px] font-medium leading-[28px] tracking-[-0.5px] [font-feature-settings:'salt'_1]";
 
-// "Calender" inside Date Picker, state=expanded (UOI DS 1276:2631 start-date, 1276:2809 end-date)
+// "Calender" inside Date Picker, state=expanded (UOI DS 1276:2631 start-date, 1276:2809 end-date; range look from
+// 8641:5634). With pickMonthYear (date of birth), the month and year in the header open month and year grids, as in
+// the purchase-flow DobField.
 function Calendar({
   selected,
   rangeStart,
   minDate,
   maxDate,
+  pickMonthYear,
+  initialMonth,
   onPick,
 }: {
   selected?: Date;
@@ -276,10 +280,14 @@ function Calendar({
   // Days outside [minDate, maxDate] can't be picked (shown in Type/color-text-disabled).
   minDate?: Date;
   maxDate?: Date;
+  pickMonthYear?: boolean;
+  // Month shown first when nothing is selected.
+  initialMonth?: Date;
   onPick: (d: Date) => void;
 }) {
-  const initial = selected ?? minDate ?? rangeStart ?? new Date();
+  const initial = selected ?? initialMonth ?? minDate ?? rangeStart ?? new Date();
   const [month, setMonth] = useState(new Date(initial.getFullYear(), initial.getMonth(), 1));
+  const [view, setView] = useState<"days" | "months" | "years">("days");
   const selectedTime = selected?.getTime();
   useEffect(() => {
     if (selected) setMonth(new Date(selected.getFullYear(), selected.getMonth(), 1));
@@ -296,6 +304,25 @@ function Calendar({
   const inRange = (d: Date) => !!rangeStart && !!selected && d >= rangeStart && d <= selected && rangeStart < selected;
   const shift = (n: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + n, 1));
   const header = "whitespace-nowrap text-center text-[18px] font-bold capitalize leading-[28px] text-white [font-feature-settings:'salt'_1]";
+  const lastYear = (maxDate ?? new Date()).getFullYear();
+  const years = Array.from({ length: lastYear - 1920 + 1 }, (_, i) => lastYear - i);
+  // Month / year cells (purchase-flow DobField): 8px radius, selected in Sure Blue.
+  const gridCell = (sel: boolean) =>
+    `cursor-pointer rounded-[8px] px-[4px] text-[13px] ${sel ? "bg-primary-sureblue text-white" : "bg-bg-white text-text-primary"}`;
+
+  const headerLabel = (label: string | number, to: "months" | "years") =>
+    pickMonthYear ? (
+      <button type="button" onClick={() => setView(to)} className="flex cursor-pointer items-center gap-[5px]">
+        <span className={header}>{label}</span>
+        <img src={assets.sortDown} alt="" width={12} height={12} className="size-[12px]" />
+      </button>
+    ) : (
+      // Without pickMonthYear the carets have no designed menu, so they are labels only.
+      <div className="flex items-center gap-[5px]">
+        <p className={header}>{label}</p>
+        <img src={assets.sortDown} alt="" width={12} height={12} className="size-[12px]" />
+      </div>
+    );
 
   return (
     <div className="flex h-[267px] w-full flex-col items-start bg-bg-white">
@@ -303,57 +330,90 @@ function Calendar({
         <button type="button" onClick={() => shift(-1)} className="h-[24px] w-[15px] shrink-0 cursor-pointer">
           <img src={assets.chevronLeft} alt="Previous month" width={15} height={24} />
         </button>
-        {/* The month and year carets have no designed menu, so they are labels only. */}
-        <div className="flex items-center gap-[5px]">
-          <p className={header}>{MONTHS[month.getMonth()]}</p>
-          <img src={assets.sortDown} alt="" width={12} height={12} className="size-[12px]" />
-        </div>
-        <div className="flex items-center gap-[5px]">
-          <p className={header}>{month.getFullYear()}</p>
-          <img src={assets.sortDown} alt="" width={12} height={12} className="size-[12px]" />
-        </div>
+        {headerLabel(MONTHS[month.getMonth()], "months")}
+        {headerLabel(month.getFullYear(), "years")}
         <button type="button" onClick={() => shift(1)} className="h-[21px] w-[12px] shrink-0 cursor-pointer">
           <img src={assets.chevronRight} alt="Next month" width={12} height={21} />
         </button>
       </div>
       <div className="flex h-[219px] w-full flex-col items-center rounded-bl-[10px] rounded-br-[10px] border border-solid border-[rgba(0,0,0,0.08)] p-[10px]">
-        <div className="flex min-h-px w-full flex-[1_0_0] items-start">
-          {WEEKDAYS.map((w) => (
-            <div key={w} className="flex min-w-px flex-[1_0_0] items-center justify-center rounded-[4px] pt-[2px]">
-              <p className="whitespace-nowrap text-center text-[14px] font-bold leading-[28px] tracking-[-1px] text-text-secondary [font-feature-settings:'salt'_1]">
-                {w}
-              </p>
-            </div>
-          ))}
-        </div>
-        {weeks.map((week, wi) => (
-          <div key={wi} className="flex min-h-px w-full flex-[1_0_0] items-center justify-center">
-            {week.map((d, di) => {
-              if (!d) return <div key={di} className="min-w-px flex-[1_0_0]" />;
-              const isSel = sameDay(d, selected) || sameDay(d, rangeStart);
-              const blocked = (!!minDate && d < minDate) || (!!maxDate && d > maxDate);
-              const band = inRange(d);
-              const bandShape = `${sameDay(d, rangeStart) ? "rounded-l-[24px]" : ""} ${sameDay(d, selected) ? "rounded-r-[24px]" : ""}`;
-              return (
-                <button
-                  key={di}
-                  type="button"
-                  disabled={blocked && !isSel}
-                  onClick={() => onPick(d)}
-                  className={`flex h-[30px] min-w-px flex-[1_0_0] items-center justify-center ${blocked ? "cursor-default" : "cursor-pointer"} ${band ? `bg-[rgba(0,94,184,0.2)] ${bandShape}` : ""}`}
-                >
-                  {isSel ? (
-                    <span className="flex size-[30px] items-center justify-center rounded-[40px] bg-primary-sureblue">
-                      <span className={`${dayText} text-white`}>{pad(d.getDate())}</span>
-                    </span>
-                  ) : (
-                    <span className={`${dayText} ${blocked ? "text-text-disabled" : "text-text-primary"}`}>{pad(d.getDate())}</span>
-                  )}
-                </button>
-              );
-            })}
+        {view === "months" && (
+          <div className="grid w-full grid-cols-3 gap-[6px] p-[4px]">
+            {MONTHS.map((m, i) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setMonth(new Date(month.getFullYear(), i, 1));
+                  setView("days");
+                }}
+                className={`${gridCell(i === month.getMonth())} py-[10px]`}
+              >
+                {m.slice(0, 3)}
+              </button>
+            ))}
           </div>
-        ))}
+        )}
+        {view === "years" && (
+          <div className="ds-scroll grid max-h-[197px] w-full grid-cols-4 gap-[6px] overflow-y-auto p-[4px]">
+            {years.map((y) => (
+              <button
+                key={y}
+                type="button"
+                onClick={() => {
+                  setMonth(new Date(y, month.getMonth(), 1));
+                  setView("months");
+                }}
+                className={`${gridCell(y === month.getFullYear())} py-[8px]`}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+        )}
+        {view === "days" && (
+          <>
+            <div className="flex min-h-px w-full flex-[1_0_0] items-start">
+              {WEEKDAYS.map((w) => (
+                <div key={w} className="flex min-w-px flex-[1_0_0] items-center justify-center rounded-[4px] pt-[2px]">
+                  <p className="whitespace-nowrap text-center text-[14px] font-bold leading-[28px] tracking-[-1px] text-text-secondary [font-feature-settings:'salt'_1]">
+                    {w}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {weeks.map((week, wi) => (
+              <div key={wi} className="flex min-h-px w-full flex-[1_0_0] items-center justify-center">
+                {week.map((d, di) => {
+                  if (!d) return <div key={di} className="min-w-px flex-[1_0_0]" />;
+                  const isSel = sameDay(d, selected) || sameDay(d, rangeStart);
+                  const blocked = (!!minDate && d < minDate) || (!!maxDate && d > maxDate);
+                  const band = inRange(d);
+                  const bandShape = `${sameDay(d, rangeStart) ? "rounded-l-[24px]" : ""} ${sameDay(d, selected) ? "rounded-r-[24px]" : ""}`;
+                  return (
+                    <button
+                      key={di}
+                      type="button"
+                      disabled={blocked && !isSel}
+                      onClick={() => onPick(d)}
+                      // The range band is the opaque bluebright-transparent tint (8641:5634), so rows don't overlap into lines.
+                      className={`flex h-[30px] min-w-px flex-[1_0_0] items-center justify-center ${blocked ? "cursor-default" : "cursor-pointer"} ${band ? `bg-bluebright-transparent ${bandShape}` : ""}`}
+                    >
+                      {isSel ? (
+                        <span className="flex size-[30px] items-center justify-center rounded-[40px] bg-primary-sureblue">
+                          <span className={`${dayText} text-white`}>{pad(d.getDate())}</span>
+                        </span>
+                      ) : (
+                        // Days inside the range keep the primary text colour, as drawn.
+                        <span className={`${dayText} ${blocked && !band ? "text-text-disabled" : "text-text-primary"}`}>{pad(d.getDate())}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
@@ -370,6 +430,8 @@ export function DateField({
   minDate,
   maxDate,
   required,
+  pickMonthYear,
+  initialMonth,
   onChange,
   onOpen,
 }: {
@@ -377,6 +439,9 @@ export function DateField({
   info?: boolean;
   tooltip?: string;
   required?: boolean;
+  // Date of birth: month and year can be picked from grids.
+  pickMonthYear?: boolean;
+  initialMonth?: Date;
   value: string;
   // For the end-date picker: the chosen start date, shown as the start of the range.
   rangeStart?: string;
@@ -426,6 +491,8 @@ export function DateField({
             rangeStart={rangeStart ? parseDate(rangeStart) : undefined}
             minDate={minDate}
             maxDate={maxDate}
+            pickMonthYear={pickMonthYear}
+            initialMonth={initialMonth}
             onPick={(d) => {
               onChange(formatDate(d));
               setOpen(false);

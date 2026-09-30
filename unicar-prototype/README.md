@@ -24,7 +24,9 @@ browser's Back and Forward buttons work.
 | `#loading` | `8391:11773` | After **Check Price**: spinner for 2 seconds, then Select Plan (the loading page is skipped by Back). |
 | `#plan` | `8391:11581` | Essential is selected by default; **Select** moves the selection and the column highlight. **Next: Add-Ons**. |
 | `#addons` | `8394:12743`, `8394:37745`, `8394:38117`, `8398:39153` | Three tabs. Each switch turns its card to the Selected variant; Policy excess (price then shows the chosen amount) and Additional named drivers show their dropdown, which floats over the cards below and makes room above the buttons. The price summary lists the chosen add-ons with an amount on the right. The button reads **Skip**, or **Next: Driver Details** once an add-on is on. |
-| `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. |
+| `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. Date of birth uses the purchase-flow picker: month and year grids from the header, no future dates. |
+| `#review` | `8394:15430`, `8394:15715` | Everything entered so far, with Edit links back to Driver Details. **Confirm & Pay** works once the declaration is ticked. The 2C2P / Visa OTP screen in `8697:12426` is left out. |
+| `#confirmation` | `8600:17327` | Thank-you page; its buttons and "here" have no destination in the design. |
 
 The summary bar shows the car and the policy dates entered on the form (the Figma values if left empty); its **Edit**
 and "Your Car" **Edit** go back to the form, "Your Plan" **Edit** to Select Plan. Price summary: subtotal = plan + paid add-ons

@@ -5,7 +5,8 @@ import { FooterShort, Header } from "./Layout";
 
 export type StepNo = 1 | 2 | 3 | 4;
 
-// Steps / Numbered (8391:11779): steps before the current one are ticked, the current one is blue, the rest grey.
+// Steps / Numbered (8391:11779): steps before the current one are ticked, the current one uses the primary gradient
+// (circle fill and label text), the rest grey.
 // The loading frame (8391:11773) labels step 2 "Add Ons"; every later frame says "Add-Ons".
 export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo; addOnsLabel?: string }) {
   const labels = ["Select Plan", addOnsLabel, "Driver Details", "Review & Pay"];
@@ -33,7 +34,7 @@ export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo;
                 <img src={assets.stepDone} alt="" width={24} height={24} className="size-[24px] shrink-0" />
               ) : (
                 <div
-                  className={`flex size-[24px] shrink-0 items-center justify-center rounded-full ${state === "active" ? "bg-primary-sureblue" : "bg-bg-whitewashed"}`}
+                  className={`flex size-[24px] shrink-0 items-center justify-center rounded-full ${state === "active" ? "bg-primary-gradient" : "bg-bg-whitewashed"}`}
                 >
                   {/* leading-none puts the digit's visual centre on the circle's centre, as in 8391:11587; at 1.4 the
                       Noto Sans digits sit low. */}
@@ -47,7 +48,7 @@ export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo;
               <p
                 className={`whitespace-nowrap text-[14px] leading-[1.5] ${
                   state === "active"
-                    ? "font-medium text-primary-sureblue"
+                    ? "bg-primary-gradient bg-clip-text font-medium text-transparent"
                     : state === "done"
                       ? "font-normal text-text-primary"
                       : "font-normal text-text-tertiary"
@@ -110,7 +111,7 @@ export function FlowShell({
 }
 
 // Page title and subtitle (8391:11625)
-export function PageTitle({ title, badge, children }: { title: string; badge?: ReactNode; children: ReactNode }) {
+export function PageTitle({ title, badge, children }: { title: string; badge?: ReactNode; children?: ReactNode }) {
   return (
     <div className="flex w-full flex-col items-start gap-[12px]">
       <div className="flex w-full items-center gap-[8px]">
@@ -119,7 +120,7 @@ export function PageTitle({ title, badge, children }: { title: string; badge?: R
         </p>
         {badge}
       </div>
-      <p className="w-full text-[16px] font-normal leading-[1.5] text-text-secondary">{children}</p>
+      {children && <p className="w-full text-[16px] font-normal leading-[1.5] text-text-secondary">{children}</p>}
     </div>
   );
 }
