@@ -10,7 +10,8 @@ export type ManualVehicle = { regNo: string; make?: string; power: string; year?
 // - "singpass": after Singpass consent (8641:3667 onwards). Vehicle details are filled and locked; the Singpass
 //   card with Clear Form stays on top.
 // - "cleared": after Clear Form. Vehicle details are keyed in; the card offers Retrieve with Singpass (8642:19917).
-// - "manual": Fill Manually from the landing page (8636:3287 onwards). Vehicle details are keyed in; no card.
+// - "manual": Fill Manually from the landing page (8636:3287 onwards). Vehicle details are keyed in; the same
+//   Retrieve with Singpass card sits on top so the user can still switch to Singpass.
 export type FormMode = "singpass" | "cleared" | "manual";
 
 type Props = {
@@ -92,7 +93,7 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
   return (
     <PageShell>
       {mode === "singpass" && <ClearFormCard onClear={onClearForm} />}
-      {mode === "cleared" && <RetrieveSingpassCard onRetrieve={onRetrieve} />}
+      {(mode === "cleared" || mode === "manual") && <RetrieveSingpassCard onRetrieve={onRetrieve} />}
       {form}
     </PageShell>
   );

@@ -9,21 +9,54 @@ export const claimsOptions = ["0", "1", "2", "3 or more"];
 
 export const promoCode = "CAR60";
 
-// Manual entry (section 8653:12505): only the options drawn in the Figma dropdowns.
-export const makeOptions = [
-  "AION ES ELECTRIC",
-  "AION Y PLUS ELECTRIC",
-  "ALFA ROMEO 159 2.2 JTS",
-  "ALFA ROMEO 159 3.2 Q4",
-  "ALFA ROMEO 159 SPORTSWAGON 2.2 JTS",
-  "ALFA ROMEO GIULETTA 1.4",
-  "ALFA ROMEO TONALE 1.5",
-  "ASTON MARTIN DB11 V12 5.2",
+// Manual entry (section 8653:12505): make/model and the power rating (kW, electric) or engine capacity (cc) it fills
+// in and locks. The first eight are the options drawn in Figma; the rest are common Singapore models added as
+// examples, with figures from the manufacturers' published specs. Not UOI's vehicle list.
+const vehicles: [string, string][] = [
+  ["AION ES ELECTRIC", "100"],
+  ["AION Y PLUS ELECTRIC", "150"],
+  ["ALFA ROMEO 159 2.2 JTS", "2198"],
+  ["ALFA ROMEO 159 3.2 Q4", "3195"],
+  ["ALFA ROMEO 159 SPORTSWAGON 2.2 JTS", "2198"],
+  ["ALFA ROMEO GIULETTA 1.4", "1368"],
+  ["ALFA ROMEO TONALE 1.5", "1469"],
+  ["ASTON MARTIN DB11 V12 5.2", "5204"],
+  ["AUDI A3 SPORTBACK 1.0 TFSI", "999"],
+  ["AUDI Q4 SPORTBACK E-TRON 40 ELECTRIC", "150"],
+  ["BMW 216I GRAN COUPE 1.5", "1499"],
+  ["BMW I4 EDRIVE35 ELECTRIC", "210"],
+  ["BMW X1 SDRIVE18I 1.5", "1499"],
+  ["BYD ATTO 3 ELECTRIC", "150"],
+  ["BYD DOLPHIN ELECTRIC", "70"],
+  ["BYD SEAL DYNAMIC ELECTRIC", "150"],
+  ["HONDA CIVIC 1.5 TURBO", "1498"],
+  ["HONDA HR-V 1.5 E:HEV", "1498"],
+  ["HONDA VEZEL 1.5", "1496"],
+  ["HYUNDAI AVANTE 1.6", "1598"],
+  ["HYUNDAI IONIQ 5 ELECTRIC", "168"],
+  ["KIA NIRO EV ELECTRIC", "150"],
+  ["LEXUS NX350H 2.5 HYBRID", "2487"],
+  ["MAZDA 3 HATCHBACK 1.5", "1496"],
+  ["MERCEDES-BENZ A200 1.3", "1332"],
+  ["MERCEDES-BENZ C180 1.5", "1496"],
+  ["MERCEDES-BENZ EQA 250 ELECTRIC", "140"],
+  ["MG 4 ELECTRIC", "125"],
+  ["NISSAN KICKS E-POWER 1.2", "1198"],
+  ["TESLA MODEL 3 RWD ELECTRIC", "208"],
+  ["TESLA MODEL Y RWD ELECTRIC", "220"],
+  ["TOYOTA COROLLA ALTIS 1.6", "1598"],
+  ["TOYOTA COROLLA CROSS 1.8 HYBRID", "1798"],
+  ["TOYOTA PRIUS 1.8 HYBRID", "1798"],
+  ["TOYOTA SIENTA 1.5 HYBRID", "1490"],
+  ["VOLKSWAGEN GOLF 1.5 ETSI", "1498"],
+  ["VOLKSWAGEN ID.4 ELECTRIC", "150"],
+  ["VOLVO XC40 RECHARGE ELECTRIC", "175"],
 ];
+export const makeOptions = vehicles.map(([make]) => make);
 export const yearOptions = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019"];
 
-// Power rating filled (and locked) by the chosen make. Values for the other models are still to come.
-export const powerByMake: Record<string, string> = { "AION ES ELECTRIC": "100" };
+// Power rating filled (and locked) by the chosen make.
+export const powerByMake: Record<string, string> = Object.fromEntries(vehicles);
 
 // Tooltip copy. The end date text is from the Figma tooltip frame (8644:11047); the others are placeholder
 // definitions for the research prototype.

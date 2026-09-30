@@ -1,0 +1,9 @@
+<svg width="62" height="2" viewBox="0 0 62 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 1H61" stroke="url(#step_tail_gradient)" stroke-width="2" stroke-linecap="round"/>
+<defs>
+<linearGradient id="step_tail_gradient" x1="1.37" y1="1" x2="61" y2="1" gradientUnits="userSpaceOnUse">
+<stop stop-color="#005EB8"/>
+<stop offset="1" stop-color="#5C55EB"/>
+</linearGradient>
+</defs>
+</svg>

@@ -38,8 +38,9 @@ import addonReplace from "./assets/addon-replace.svg";
 import addonAccessories from "./assets/addon-accessories.svg";
 import addonLoss from "./assets/addon-loss.svg";
 import addonBreakdown from "./assets/addon-breakdown.svg";
-import stepDone from "./assets/step-done.svg";
-import stepTailDone from "./assets/step-tail-done.svg";
+// Completed-step tick and tail in the primary gradient, matching the current step's circle (8391:11779).
+import stepDone from "./assets/step-done-gradient.svg";
+import stepTailDone from "./assets/step-tail-done-gradient.svg";
 import stepTailWaiting from "./assets/step-tail-waiting.svg";
 import icUp24 from "./assets/ic-up-24.svg";
 import calendarDisabled from "./assets/calendar-disabled.svg";
