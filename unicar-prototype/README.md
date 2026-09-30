@@ -52,6 +52,13 @@ date that no longer fits.
 - The Figma header fill (`8383:5200`, image `8bb609…`) is a composite: the photo darkened and fading into the page
   background. Until that export arrives, the raw photo is used.
 
+## Quote form rules
+- The start-date calendar opens on the current month; picking a start date fills the end date 365 days later, which
+  can still be changed within 9 to 18 months.
+- "I am the main driver" (default Yes) comes before "I drive at work", which is only asked (here, on Driver Details and
+  on Review) when the answer is Yes. Additional drivers aren't asked about driving at work.
+- Policy excess is always part of the policy (S$600.00 unless changed), so its card has no switch.
+
 ## Date picker
 Uses the UOI DS Date Picker "expanded" variants (start-date `1276:3259`, end-date `1276:3256`) at the DS size
 (265 × 267, 8px under the field, left-aligned): it opens on focus,

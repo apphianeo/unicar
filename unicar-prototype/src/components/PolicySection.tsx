@@ -9,12 +9,18 @@ export type Policy = {
   ncd?: string;
   experience?: string;
   claims?: string;
+  // "I drive at work" is only asked when the applicant is the main driver.
+  mainDriver: "Yes" | "No";
   driveAtWork: "Yes" | "No";
 };
 
-export const emptyPolicy: Policy = { startDate: "", endDate: "", driveAtWork: "No" };
+export const emptyPolicy: Policy = { startDate: "", endDate: "", mainDriver: "Yes", driveAtWork: "No" };
 
 const addMonths = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
+const today = new Date(new Date().setHours(0, 0, 0, 0));
+
+// A new start date fills the end date 365 days later; the user can still change it.
+export const defaultEndDate = (start: Date) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + 365);
 
 // Period of insurance: the end date must be 9 to 18 months after the start date.
 export function endDateRange(startDate: string) {
@@ -43,6 +49,7 @@ export function PolicySection({
         <DateField
           label="Insurance start date"
           value={policy.startDate}
+          initialMonth={today}
           onOpen={onStartPolicy}
           onChange={(startDate) => onPolicy({ startDate })}
         />
@@ -87,13 +94,24 @@ export function PolicySection({
           onSelect={(claims) => onPolicy({ claims })}
         />
         <RadioGroup
-          label="I drive at work"
-          tooltip={tooltips.driveAtWork}
-          value={policy.driveAtWork}
-          onChange={(driveAtWork) => onPolicy({ driveAtWork })}
+          label="I am the main driver"
+          info={false}
+          value={policy.mainDriver}
+          onChange={(mainDriver) => onPolicy({ mainDriver })}
           className="min-w-px flex-[1_0_0] self-stretch"
         />
       </div>
+      {policy.mainDriver === "Yes" && (
+        <div className="flex w-full items-start gap-[24px]">
+          <RadioGroup
+            label="I drive at work"
+            tooltip={tooltips.driveAtWork}
+            value={policy.driveAtWork}
+            onChange={(driveAtWork) => onPolicy({ driveAtWork })}
+            className="h-[81px] w-[calc(50%-12px)] shrink-0"
+          />
+        </div>
+      )}
     </div>
     <Divider />
     <div className="flex w-full flex-col items-start gap-[12px]">

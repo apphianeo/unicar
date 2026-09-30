@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { HeaderSummary, PriceSummary, StepNavContext, type StepNo } from "./components/Flow";
-import { parseDate } from "./components/Form";
-import { emptyPolicy, endDateRange, type Policy } from "./components/PolicySection";
+import { formatDate, parseDate } from "./components/Form";
+import { defaultEndDate, emptyPolicy, type Policy } from "./components/PolicySection";
 import {
   addOnCost,
   addOnCount,
@@ -35,15 +35,16 @@ const pageFromHash = (): Page => {
 };
 
 const emptyVehicle: ManualVehicle = { regNo: "", power: "" };
-const emptyAddOns: AddOnState = { selected: [], excess: "S$600.00 (Default)", drivers: "1 (free)" };
+// Policy excess is always part of the policy, at S$600.00 unless changed.
+const emptyAddOns: AddOnState = { selected: ["excess"], excess: "S$600.00 (Default)", drivers: "1 (free)" };
 
-// A new start date clears an end date that no longer falls 9 to 18 months after it.
+// Picking or typing a full start date fills the end date 365 days later (the user can still change it within
+// 9 to 18 months); an incomplete start date clears it.
 function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
   const next = { ...prev, ...p };
-  if (p.startDate !== undefined && next.endDate) {
-    const { min, max } = endDateRange(next.startDate);
-    const e = parseDate(next.endDate);
-    if (!min || !max || !e || e < min || e > max) next.endDate = "";
+  if (p.startDate !== undefined && p.startDate !== prev.startDate) {
+    const start = parseDate(p.startDate);
+    next.endDate = start ? formatDate(defaultEndDate(start)) : "";
   }
   return next;
 }
@@ -234,14 +235,14 @@ export default function App() {
           { label: "Address", value: a.address },
           { label: "Unit no.", value: a.unit },
           { label: "Years of driving experience", value: dash(policy.experience) },
-          { label: "I drive at work", value: policy.driveAtWork },
+          { label: "I am the main driver", value: policy.mainDriver },
+          ...(policy.mainDriver === "Yes" ? [{ label: "I drive at work", value: policy.driveAtWork }] : []),
         ]}
         extraDrivers={extraDrivers.map((d) => [
           { label: "Full name as per NRIC/FIN", value: dash(d.name) },
           { label: "Date of birth", value: dash(d.dob) },
           { label: "NRIC/FIN", value: dash(d.nric) },
           { label: "Years of driving experience", value: dash(d.experience) },
-          { label: "I drive at work", value: d.driveAtWork },
         ])}
         vehicle={[
           { label: "Vehicle Make and Model", value: make },
@@ -281,6 +282,7 @@ export default function App() {
         priceSummary={priceSummary("driver")}
         make={make}
         regNo={regNo}
+        mainDriver={policy.mainDriver}
         driveAtWork={policy.driveAtWork}
         onDriveAtWork={(driveAtWork) => setPolicy((prev) => ({ ...prev, driveAtWork }))}
         extraDrivers={extraDrivers}

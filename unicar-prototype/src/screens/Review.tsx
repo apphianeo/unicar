@@ -27,6 +27,9 @@ function Section({ title, fields, onEdit }: { title: string; fields: Field[]; on
   );
 }
 
+// T&C links are underlined so they read as links, as in the purchase-flow declaration.
+const termsLink = "text-primary-sureblue underline underline-offset-2";
+
 const declarations: ReactNode[] = [
   "All the data/ information provided in this electronic proposal are true and that I have not misstated or suppressed any material facts",
   "I undertake to inform UOI of any material alteration to these facts whether occurring before or after completion of this contract of insurance",
@@ -35,14 +38,14 @@ const declarations: ReactNode[] = [
   "I am aware that UOI has the right to terminate this contract of insurance if I did not declare material facts such as my accident record if any at the time of application",
   <>
     I agree to the Terms and Conditions set in the{" "}
-    <a href={policyWordingUrl} target="_blank" rel="noopener noreferrer" className="text-primary-sureblue">
+    <a href={policyWordingUrl} target="_blank" rel="noopener noreferrer" className={termsLink}>
       policy wording
     </a>
   </>,
-  // The privacy notice has no link in the design, so it is text only.
+  // The privacy notice has no link target in the design, so it is styled as a link but goes nowhere.
   <>
     I consent to United Overseas Insurance (“UOI”) in collecting, using, disclosing, and processing my personal data in
-    accordance with UOI's <span className="text-primary-sureblue">privacy notice</span>
+    accordance with UOI's <span className={termsLink}>privacy notice</span>
   </>,
 ];
 

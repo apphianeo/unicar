@@ -94,7 +94,8 @@ export default function AddOns({
                 {addOns
                   .filter((a) => a.tab === tab)
                   .map((a, i, shown) => {
-                    const on = state.selected.includes(a.id);
+                    // Policy excess is always included (S$600.00 by default); only its amount can change.
+                    const on = a.id === "excess" || state.selected.includes(a.id);
                     // Selected Policy excess shows the chosen amount instead of "From S$600.00" (8398:39153); named drivers
                     // show what the chosen number costs ("Free" for 1 or 2).
                     const driversCost = addOnCost("drivers", state.drivers);
@@ -121,7 +122,7 @@ export default function AddOns({
                             </div>
                             <div className="flex items-center justify-end gap-[12px]">
                               <p className="whitespace-nowrap text-[16px] font-semibold leading-[1.5] text-text-primary">{price}</p>
-                              <Switch on={on} label={a.title} onChange={(v) => toggle(a.id, v)} />
+                              {a.id !== "excess" && <Switch on={on} label={a.title} onChange={(v) => toggle(a.id, v)} />}
                             </div>
                           </div>
                           <p className="w-full text-[14px] font-normal leading-[1.5] text-text-secondary">{a.description}</p>
@@ -145,8 +146,12 @@ export default function AddOns({
                   })}
               </div>
             </div>
-            {/* "Skip" with nothing selected (8394:12743), "Next: Driver Details" once an add-on is on (8398:39153). */}
-            <FlowActions next={state.selected.length ? "Next: Driver Details" : "Skip"} onBack={onBack} onNext={onNext} />
+            {/* "Skip" with nothing selected (8394:12743), "Next: Driver Details" once an optional add-on is on (8398:39153). */}
+            <FlowActions
+              next={state.selected.some((id) => id !== "excess") ? "Next: Driver Details" : "Skip"}
+              onBack={onBack}
+              onNext={onNext}
+            />
           </div>
           {priceSummary}
         </div>

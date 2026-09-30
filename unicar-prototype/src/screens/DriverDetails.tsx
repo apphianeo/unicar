@@ -5,8 +5,8 @@ import { DateField, Dropdown, InputHeader, RadioGroup, TextField } from "../comp
 import { experienceOptions, singpassApplicant, tooltips } from "../data/mock";
 
 export type YesNo = "Yes" | "No";
-export type ExtraDriver = { name: string; dob: string; nric: string; experience?: string; driveAtWork: YesNo };
-export const emptyExtraDriver: ExtraDriver = { name: "", dob: "", nric: "", driveAtWork: "No" };
+export type ExtraDriver = { name: string; dob: string; nric: string; experience?: string };
+export const emptyExtraDriver: ExtraDriver = { name: "", dob: "", nric: "" };
 
 const lockedBox =
   "flex h-[48px] items-center gap-[8px] rounded-[8px] border border-solid border-line bg-disabled-bg px-[16px] py-[12px]";
@@ -40,6 +40,7 @@ export default function DriverDetails({
   priceSummary,
   make,
   regNo,
+  mainDriver,
   driveAtWork,
   onDriveAtWork,
   extraDrivers,
@@ -55,6 +56,8 @@ export default function DriverDetails({
   priceSummary: ReactNode;
   make: string;
   regNo: string;
+  // "I drive at work" is only asked when the applicant said they are the main driver on the quote form.
+  mainDriver: YesNo;
   driveAtWork: YesNo;
   onDriveAtWork: (v: YesNo) => void;
   extraDrivers: ExtraDriver[];
@@ -109,15 +112,17 @@ export default function DriverDetails({
                   <TextField label="Address" required placeholder="" value={a.address} disabled />
                   <TextField label="Unit no." required placeholder="" value={a.unit} disabled />
                 </Row>
-                <Row>
-                  <RadioGroup
-                    label="I drive at work"
-                    tooltip={tooltips.driveAtWork}
-                    value={driveAtWork}
-                    onChange={onDriveAtWork}
-                    className={`h-[81px] ${half}`}
-                  />
-                </Row>
+                {mainDriver === "Yes" && (
+                  <Row>
+                    <RadioGroup
+                      label="I drive at work"
+                      tooltip={tooltips.driveAtWork}
+                      value={driveAtWork}
+                      onChange={onDriveAtWork}
+                      className={`h-[81px] ${half}`}
+                    />
+                  </Row>
+                )}
               </Section>
 
               {extraDrivers.map((d, i) => (
@@ -153,15 +158,6 @@ export default function DriverDetails({
                       value={d.experience}
                       options={experienceOptions}
                       onSelect={(experience) => onExtraDriver(i, { experience })}
-                    />
-                  </Row>
-                  <Row>
-                    <RadioGroup
-                      label="I drive at work"
-                      tooltip={tooltips.driveAtWork}
-                      value={d.driveAtWork}
-                      onChange={(driveAtWork) => onExtraDriver(i, { driveAtWork })}
-                      className={`h-[81px] ${half}`}
                     />
                   </Row>
                 </Section>
