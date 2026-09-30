@@ -25,6 +25,8 @@ export function Popover({ children }: { children: ReactNode }) {
         // The arrow's flat edge is at x=7.17 of its 8px box: 7px out, it meets the body with no seam in the shadow.
         className="absolute left-[-7px] top-[calc(50%+0.5px)] h-[16px] w-[8px] -translate-y-1/2"
       />
+      {/* White overlap across the joint, inside the arrow's outline, so no hairline shows at fractional zoom levels. */}
+      <span className="absolute left-[-1px] top-[calc(50%+0.5px)] h-[12px] w-[2px] -translate-y-1/2 bg-bg-white" />
     </span>
   );
 }

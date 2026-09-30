@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { assets } from "../assets";
 import { money } from "../data/mock";
 import { Button } from "./Button";
@@ -9,7 +9,11 @@ export type StepNo = 1 | 2 | 3 | 4;
 // Steps / Numbered (8391:11779): steps before the current one are ticked, the current one uses the primary gradient
 // (circle fill and label text), the rest grey.
 // The loading frame (8391:11773) labels step 2 "Add Ons"; every later frame says "Add-Ons".
+// Set by the app: where a completed step in the stepper takes you.
+export const StepNavContext = createContext<((step: StepNo) => void) | null>(null);
+
 export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo; addOnsLabel?: string }) {
+  const goToStep = useContext(StepNavContext);
   const labels = ["Select Plan", addOnsLabel, "Driver Details", "Review & Pay"];
   return (
     <div className="flex items-center gap-x-[12px] self-stretch">
@@ -30,7 +34,13 @@ export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo;
                 />
               </div>
             )}
-            <div className="flex shrink-0 items-center gap-[8px]">
+            {/* Completed steps are links back to that step. */}
+            <button
+              type="button"
+              disabled={state !== "done" || !goToStep}
+              onClick={() => goToStep?.(n)}
+              className={`flex shrink-0 items-center gap-[8px] ${state === "done" && goToStep ? "cursor-pointer" : "cursor-default"}`}
+            >
               {state === "done" ? (
                 <img src={assets.stepDone} alt="" width={24} height={24} className="size-[24px] shrink-0" />
               ) : (
@@ -57,7 +67,7 @@ export function Stepper({ current, addOnsLabel = "Add-Ons" }: { current: StepNo;
               >
                 {label}
               </p>
-            </div>
+            </button>
           </div>
         );
       })}

@@ -30,6 +30,12 @@
   --summary-chip-bg: #f5f5f5; /* discount-code chip in the price summary */
 }
 
+/* Always reserve the scrollbar's space, so the page doesn't jump sideways when content grows past the window
+   (e.g. switching on add-ons that show a dropdown). */
+html {
+  scrollbar-gutter: stable;
+}
+
 html,
 body {
   font-family: "Noto Sans", sans-serif;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HeaderSummary, PriceSummary } from "./components/Flow";
+import { HeaderSummary, PriceSummary, StepNavContext, type StepNo } from "./components/Flow";
 import { parseDate } from "./components/Form";
 import { emptyPolicy, endDateRange, type Policy } from "./components/PolicySection";
 import {
@@ -137,6 +137,12 @@ export default function App() {
     />
   );
 
+  // Completed steps in the stepper go back to their page.
+  const stepPages: Page[] = ["plan", "addons", "driver", "review"];
+  const flow = (el: JSX.Element) => (
+    <StepNavContext.Provider value={(n: StepNo) => go(stepPages[n - 1])}>{el}</StepNavContext.Provider>
+  );
+
   if (page === "consent") {
     return (
       <SingpassConsent
@@ -180,7 +186,7 @@ export default function App() {
   }
 
   if (page === "plan") {
-    return (
+    return flow(
       <SelectPlan
         summary={summary}
         selected={plan}
@@ -192,7 +198,7 @@ export default function App() {
   }
 
   if (page === "addons") {
-    return (
+    return flow(
       <AddOnsScreen
         summary={summary}
         priceSummary={priceSummary("addons")}
@@ -214,7 +220,7 @@ export default function App() {
     const dash = (v?: string) => v || "-";
     const power = singpassFilled ? singpassVehicle.power : (vehicle.make && powerByMake[vehicle.make]) || vehicle.power;
     const year = singpassFilled ? singpassVehicle.year : vehicle.year;
-    return (
+    return flow(
       <Review
         summary={summary}
         priceSummary={priceSummary("driver")}
@@ -269,7 +275,7 @@ export default function App() {
   if (page === "confirmation") return <Confirmation />;
 
   if (page === "driver") {
-    return (
+    return flow(
       <DriverDetails
         summary={summary}
         priceSummary={priceSummary("driver")}
