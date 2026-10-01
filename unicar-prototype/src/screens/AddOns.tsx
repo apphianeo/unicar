@@ -50,6 +50,8 @@ export default function AddOns({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openMenu, tab]);
 
+  const excessAddOn = addOns.find((a) => a.id === "excess")!;
+
   const toggle = (id: AddOnId, on: boolean) => {
     if (!on && openMenu === id) setOpenMenu(null);
     onChange({ selected: on ? [...state.selected, id] : state.selected.filter((s) => s !== id) });
@@ -64,6 +66,31 @@ export default function AddOns({
         <div className="flex w-full flex-[1_0_auto] items-start gap-[24px]">
           <div className="flex min-w-px flex-[1_0_0] flex-col items-start justify-between gap-[24px] self-stretch">
             <div className="flex w-full flex-col items-start gap-[24px]">
+              {/* Policy excess is part of every policy, so it sits above the optional add-ons as its own section: no switch,
+                  the amount always shown in its dropdown (S$600.00 by default). */}
+              <div className="relative z-[20] flex w-full flex-col items-start gap-[12px]">
+                <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Your policy excess</p>
+                <div className="flex w-full flex-col items-start justify-center rounded-[12px] border border-solid border-transparent bg-bg-white p-[16px] drop-shadow-overlay">
+                  <div className="flex w-full flex-col items-start gap-[12px]">
+                    <div className="flex w-full items-center gap-[12px]">
+                      <div className="flex size-[32px] shrink-0 items-center justify-center rounded-[8px] bg-bluebright-transparent">
+                        <img src={icons.excess} alt="" width={18} height={18} className="size-[17.778px]" />
+                      </div>
+                      <p className="min-w-px flex-[1_0_0] text-[18px] font-semibold leading-[1.5] text-text-primary">{excessAddOn.title}</p>
+                    </div>
+                    <p className="w-full text-[14px] font-normal leading-[1.5] text-text-secondary">{excessAddOn.description}</p>
+                    <div className="flex w-full max-w-[320px] items-start">
+                      <Dropdown
+                        value={state.excess}
+                        options={excessOptions}
+                        onSelect={(v) => onChange({ excess: v })}
+                        onOpenChange={(open) => setOpenMenu(open ? "excess" : null)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Optional add-ons</p>
               {/* Tabs, size medium (8394:37568) */}
               <div className="flex w-full items-start border-b border-solid border-line" role="tablist">
                 {addOnTabs.map((t) => {
@@ -92,7 +119,7 @@ export default function AddOns({
               </div>
               <div ref={listRef} className="flex w-full flex-col items-start gap-[24px]" style={{ paddingBottom: room }}>
                 {addOns
-                  .filter((a) => a.tab === tab)
+                  .filter((a) => a.tab === tab && a.id !== "excess")
                   .map((a, i, shown) => {
                     // Policy excess is always included (S$600.00 by default); only its amount can change.
                     const on = a.id === "excess" || state.selected.includes(a.id);
