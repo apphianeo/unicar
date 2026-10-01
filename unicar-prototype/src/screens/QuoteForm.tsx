@@ -2,11 +2,13 @@ import { Dropdown, RadioGroup, TextField } from "../components/Form";
 import { ClearFormCard, RetrieveSingpassCard } from "../components/InfoCard";
 import { PageShell } from "../components/Layout";
 import { PolicySection, type Policy } from "../components/PolicySection";
-import { makeOptions, powerByMake, singpassVehicle, tooltips, yearOptions } from "../data/mock";
+import { makeOptions, ncdOptions, powerByMake, singpassVehicle, tooltips, yearOptions } from "../data/mock";
+import { parseDate } from "../components/Form";
 
 export type ManualVehicle = { regNo: string; make?: string; power: string; year?: string };
 
-// The quote form, in one of three states:
+// The quote form (8723:26351 … 8724:30894): About your vehicle, then About you and About your policy revealed as the
+// fields above them are filled. In one of three states:
 // - "singpass": after Singpass consent (8641:3667 onwards). Vehicle details are filled and locked; the Singpass
 //   card with Clear Form stays on top.
 // - "cleared": after Clear Form. Vehicle details are keyed in; the card offers Retrieve with Singpass (8642:19917).
@@ -31,14 +33,22 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
   const filled = mode === "singpass";
   // In the manual state, picking a make fills in its power rating and locks it (8649:7800).
   const lockedPower = !filled && vehicle.make ? powerByMake[vehicle.make] : undefined;
+  const vehicleDone = filled || (!!vehicle.regNo && !!vehicle.make && !!(lockedPower ?? vehicle.power) && !!vehicle.year);
+  const canCheckPrice =
+    vehicleDone &&
+    !!policy.ncd &&
+    !!policy.experience &&
+    !!policy.claims &&
+    !!parseDate(policy.startDate) &&
+    !!parseDate(policy.endDate);
 
   const form = (
     <div className="flex w-full flex-col items-end justify-center gap-[32px] rounded-[12px] bg-bg-white p-[16px] drop-shadow-overlay">
       <div className="flex w-full flex-col items-start gap-[24px]">
-        <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Vehicle details</p>
+        <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">About your vehicle</p>
         <div className="flex w-full items-start gap-[24px]">
           {filled ? (
-            <Dropdown label="Vehicle registration number" value={singpassVehicle.regNo} disabled />
+            <TextField label="Vehicle registration number" placeholder="" value={singpassVehicle.regNo} disabled />
           ) : (
             <TextField
               label="Vehicle registration number"
@@ -76,17 +86,31 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
             onSelect={(year) => onVehicle({ year })}
           />
         </div>
-        <div className="flex h-[81px] w-full items-start">
+        <div className="flex h-[81px] w-full items-start gap-[24px]">
+          <Dropdown
+            label="No claims discount (NCD)"
+            info
+            tooltip={tooltips.ncd}
+            value={policy.ncd}
+            options={ncdOptions}
+            onSelect={(ncd) => onPolicy({ ncd })}
+          />
           <RadioGroup
             label="Off-peak car"
             tooltip={tooltips.offPeak}
             value={offPeak}
             onChange={onOffPeak}
-            className="h-full w-[484px]"
+            className="h-full min-w-px flex-[1_0_0]"
           />
         </div>
       </div>
-      <PolicySection policy={policy} onPolicy={onPolicy} onCheckPrice={onCheckPrice} />
+      <PolicySection
+        policy={policy}
+        onPolicy={onPolicy}
+        showAboutYou={!!policy.ncd}
+        canCheckPrice={canCheckPrice}
+        onCheckPrice={onCheckPrice}
+      />
     </div>
   );
 

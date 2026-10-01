@@ -53,10 +53,13 @@ date that no longer fits.
   background. Until that export arrives, the raw photo is used.
 
 ## Quote form rules
+- Progressive disclosure (8723:26351 … 8724:30894): **About your vehicle** (incl. NCD and off-peak) first; **About you**
+  (main driver, drive at work, driving experience, claims) once NCD is chosen; **About your policy** (dates, with
+  "Total duration") once experience and claims are chosen. Check Price stays disabled until everything is filled.
 - The start-date calendar opens on the current month; picking a start date fills the end date 365 days later, which
   can still be changed within 9 to 18 months.
-- "I am the main driver" (default Yes) comes before "I drive at work", which is only asked (here, on Driver Details and
-  on Review) when the answer is Yes. Additional drivers aren't asked about driving at work.
+- "Are you the main driver?" (default Yes) comes before "Do you drive at work?", which is only asked (here, on Driver
+  Details and on Review) when the answer is Yes. Additional drivers aren't asked about driving at work.
 - Policy excess is always part of the policy (S$600.00 unless changed), so its card has no switch.
 
 ## Date picker

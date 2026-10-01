@@ -1,5 +1,5 @@
 import { assets } from "../assets";
-import { claimsOptions, experienceOptions, ncdOptions, promoCode, tooltips } from "../data/mock";
+import { claimsOptions, experienceOptions, promoCode, tooltips } from "../data/mock";
 import { Button, TextButton } from "./Button";
 import { DateField, Divider, Dropdown, parseDate, PromoField, RadioGroup } from "./Form";
 
@@ -28,99 +28,129 @@ export function endDateRange(startDate: string) {
   return { min: start && addMonths(start, 9), max: start && addMonths(start, 18) };
 }
 
-// Policy details, promo and Check Price: the same in the Singpass and manual flows.
+const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"}`;
+
+// "Total duration: 1 year" under the end date (8724:30964), in years, months and days.
+export function durationText(startDate: string, endDate: string) {
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  if (!start || !end || end <= start) return undefined;
+  let months = (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth();
+  let days = end.getDate() - start.getDate();
+  if (days < 0) {
+    months -= 1;
+    days += new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+  }
+  const parts = [
+    Math.floor(months / 12) && plural(Math.floor(months / 12), "year"),
+    months % 12 && plural(months % 12, "month"),
+    days && plural(days, "day"),
+  ].filter(Boolean);
+  return `Total duration: ${parts.join(" ")}`;
+}
+
+const sectionTitle = "whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary";
+
+// "About you" and "About your policy" (8724:30894), revealed one at a time so the form doesn't overwhelm: About you
+// appears once NCD is chosen, About your policy once driving experience and claims are chosen. Then the promo and
+// Check Price, which stays disabled until every field is filled (8723:26351).
 export function PolicySection({
   policy,
   onPolicy,
-  onStartPolicy,
+  showAboutYou,
+  canCheckPrice,
   onCheckPrice,
 }: {
   policy: Policy;
   onPolicy: (p: Partial<Policy>) => void;
-  onStartPolicy?: () => void;
+  showAboutYou: boolean;
+  canCheckPrice: boolean;
   onCheckPrice: () => void;
 }) {
   const { min: endMin, max: endMax } = endDateRange(policy.startDate);
+  const showPolicy = showAboutYou && !!policy.experience && !!policy.claims;
   return (
     <>
-    <div className="flex w-full flex-col items-start gap-[24px]">
-      <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Policy details</p>
-      <div className="flex w-full items-start gap-[24px]">
-        <DateField
-          label="Insurance start date"
-          value={policy.startDate}
-          initialMonth={today}
-          onOpen={onStartPolicy}
-          onChange={(startDate) => onPolicy({ startDate })}
-        />
-        <DateField
-          label="Insurance end date"
-          info
-          tooltip={tooltips.endDate}
-          value={policy.endDate}
-          rangeStart={policy.startDate}
-          minDate={endMin}
-          maxDate={endMax}
-          onOpen={onStartPolicy}
-          onChange={(endDate) => onPolicy({ endDate })}
-        />
-      </div>
-      <div className="flex w-full items-start gap-[24px]">
-        <Dropdown
-          label="No claims discount (NCD)"
-          info
-          tooltip={tooltips.ncd}
-          value={policy.ncd}
-          options={ncdOptions}
-          onOpen={onStartPolicy}
-          onSelect={(ncd) => onPolicy({ ncd })}
-        />
-        <Dropdown
-          label="Years of driving experience"
-          value={policy.experience}
-          options={experienceOptions}
-          onOpen={onStartPolicy}
-          onSelect={(experience) => onPolicy({ experience })}
-        />
-      </div>
-      <div className="flex w-full items-start gap-[24px]">
-        <Dropdown
-          label="Claims made in the last 3 years"
-          info
-          tooltip={tooltips.claims}
-          value={policy.claims}
-          options={claimsOptions}
-          onOpen={onStartPolicy}
-          onSelect={(claims) => onPolicy({ claims })}
-        />
-        <RadioGroup
-          label="I am the main driver"
-          info={false}
-          value={policy.mainDriver}
-          onChange={(mainDriver) => onPolicy({ mainDriver })}
-          className="min-w-px flex-[1_0_0] self-stretch"
-        />
-      </div>
-      {policy.mainDriver === "Yes" && (
-        <div className="flex w-full items-start gap-[24px]">
-          <RadioGroup
-            label="I drive at work"
-            tooltip={tooltips.driveAtWork}
-            value={policy.driveAtWork}
-            onChange={(driveAtWork) => onPolicy({ driveAtWork })}
-            className="h-[81px] w-[calc(50%-12px)] shrink-0"
-          />
-        </div>
+      {showAboutYou && (
+        <>
+          <Divider />
+          <div className="flex w-full flex-col items-start gap-[24px]">
+            <p className={sectionTitle}>About you</p>
+            <div className="flex w-full items-start gap-[24px]">
+              <RadioGroup
+                label="Are you the main driver?"
+                info={false}
+                value={policy.mainDriver}
+                onChange={(mainDriver) => onPolicy({ mainDriver })}
+                className="min-w-px flex-[1_0_0] self-stretch"
+              />
+              {/* Only asked of the main driver. */}
+              {policy.mainDriver === "Yes" ? (
+                <RadioGroup
+                  label="Do you drive at work?"
+                  info={false}
+                  value={policy.driveAtWork}
+                  onChange={(driveAtWork) => onPolicy({ driveAtWork })}
+                  className="h-[81px] min-w-px flex-[1_0_0]"
+                />
+              ) : (
+                <div className="h-[81px] min-w-px flex-[1_0_0]" />
+              )}
+            </div>
+            <div className="flex w-full items-start gap-[24px]">
+              <Dropdown
+                label="Years of driving experience"
+                value={policy.experience}
+                options={experienceOptions}
+                onSelect={(experience) => onPolicy({ experience })}
+              />
+              <Dropdown
+                label="Claims made in the last 3 years"
+                info
+                tooltip={tooltips.claims}
+                value={policy.claims}
+                options={claimsOptions}
+                onSelect={(claims) => onPolicy({ claims })}
+              />
+            </div>
+          </div>
+        </>
       )}
-    </div>
-    <Divider />
-    <div className="flex w-full flex-col items-start gap-[12px]">
-      <PromoField code={promoCode} />
-      <TextButton icon={assets.icPlus}>Have an Agent ID?</TextButton>
-    </div>
-    <Button variant="primary" onClick={onCheckPrice}>
-      Check Price
-    </Button>
+      {showPolicy && (
+        <>
+          <Divider />
+          <div className="flex w-full flex-col items-start gap-[24px]">
+            <p className={sectionTitle}>About your policy</p>
+            <div className="flex w-full items-start gap-[24px]">
+              <DateField
+                label="Insurance start date"
+                value={policy.startDate}
+                initialMonth={today}
+                onChange={(startDate) => onPolicy({ startDate })}
+              />
+              <DateField
+                label="Insurance end date"
+                info
+                tooltip={tooltips.endDate}
+                value={policy.endDate}
+                rangeStart={policy.startDate}
+                minDate={endMin}
+                maxDate={endMax}
+                helper={durationText(policy.startDate, policy.endDate)}
+                onChange={(endDate) => onPolicy({ endDate })}
+              />
+            </div>
+          </div>
+        </>
+      )}
+      <Divider />
+      <div className="flex w-full flex-col items-start gap-[12px]">
+        <PromoField code={promoCode} />
+        <TextButton icon={assets.icPlus}>Have an Agent ID?</TextButton>
+      </div>
+      <Button variant="primary" disabled={!canCheckPrice} onClick={onCheckPrice}>
+        Check Price
+      </Button>
     </>
   );
 }

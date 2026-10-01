@@ -6,22 +6,27 @@ export function Button({
   children,
   onClick,
   compact,
+  disabled,
 }: {
   variant: "primary" | "secondary";
   children: ReactNode;
   onClick?: () => void;
+  // Primary disabled (type=primary disabled): #E0E0E0 fill, Type/color-text-disabled label.
+  disabled?: boolean;
   // 24px side padding (confirmation 8600:17436) instead of 32px.
   compact?: boolean;
 }) {
-  const look =
-    variant === "primary"
+  const look = disabled
+    ? "bg-btn-disabled text-text-disabled"
+    : variant === "primary"
       ? "bg-primary-sureblue text-white"
       : "border border-solid border-line bg-bg-white text-text-secondary";
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-[52px] shrink-0 cursor-pointer items-center justify-center rounded-[8px] ${compact ? "px-[24px]" : "px-[32px]"} py-[14px] ${look}`}
+      disabled={disabled}
+      className={`flex h-[52px] shrink-0 ${disabled ? "cursor-default" : "cursor-pointer"} items-center justify-center rounded-[8px] ${compact ? "px-[24px]" : "px-[32px]"} py-[14px] ${look}`}
     >
       <span className="whitespace-nowrap text-[16px] font-medium leading-[1.5]">{children}</span>
     </button>

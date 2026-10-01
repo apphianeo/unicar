@@ -235,7 +235,7 @@ export default function App() {
           { label: "Address", value: a.address },
           { label: "Unit no.", value: a.unit },
           { label: "Years of driving experience", value: dash(policy.experience) },
-          { label: "I am the main driver", value: policy.mainDriver },
+          { label: "Are you the main driver?", value: policy.mainDriver },
           ...(policy.mainDriver === "Yes" ? [{ label: "I drive at work", value: policy.driveAtWork }] : []),
         ]}
         extraDrivers={extraDrivers.map((d) => [

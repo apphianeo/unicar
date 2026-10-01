@@ -28,6 +28,7 @@
   --badge-green: #6cd999; /* Badge state=new / discount (8310:9822, 8571:17514) */
   --primary-gray-300: #d2d5da; /* Switch off (8006:1149) */
   --summary-chip-bg: #f5f5f5; /* discount-code chip in the price summary */
+  --button-disabled-bg: #e0e0e0; /* Buttons type=primary disabled (8723:26351) */
 }
 
 /* Always reserve the scrollbar's space, so the page doesn't jump sideways when content grows past the window

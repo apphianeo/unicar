@@ -23,6 +23,7 @@ export default {
         "badge-new": "var(--badge-green)",
         "switch-off": "var(--primary-gray-300)",
         "summary-chip": "var(--summary-chip-bg)",
+        "btn-disabled": "var(--button-disabled-bg)",
         line: "var(--utility-color-line)",
       },
       backgroundImage: {

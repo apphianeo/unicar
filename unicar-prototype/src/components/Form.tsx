@@ -434,6 +434,7 @@ export function DateField({
   required,
   pickMonthYear,
   initialMonth,
+  helper,
   onChange,
   onOpen,
 }: {
@@ -441,6 +442,8 @@ export function DateField({
   info?: boolean;
   tooltip?: string;
   required?: boolean;
+  // Caption under the field, e.g. "Total duration: 1 year" (8724:30964).
+  helper?: string;
   // Date of birth: month and year can be picked from grids.
   pickMonthYear?: boolean;
   initialMonth?: Date;
@@ -468,6 +471,7 @@ export function DateField({
   return (
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
       <InputHeader label={label} info={info} tooltip={tooltip} required={required} />
+      <div className="relative w-full">
       <div className={`${fieldBox} bg-bg-white ${open ? openRing : ""}`} onClick={() => { onOpen?.(); setOpen(true); }}>
         <input
           value={value}
@@ -502,6 +506,8 @@ export function DateField({
           />
         </div>
       )}
+      </div>
+      {helper && <p className="w-full text-[12px] font-normal leading-[1.4] text-text-tertiary">{helper}</p>}
     </div>
   );
 }
