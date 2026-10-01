@@ -98,21 +98,14 @@ export const policyWordingUrl = "https://www.uoi.com.sg/assets/web-resources/uoi
 export const geographicalArea =
   "Geographical area includes Singapore, West Malaysia, Southern Thailand (up to 80km from West Malaysia), Straits between Singapore and Tanjong Belungkor (Johor)";
 
-// Add-ons (component set 8535:21169), in the order of the Select Add-Ons frame (8394:12743): Policy excess first in its
-// own section, then the optional add-ons in one list.
+// Add-ons (component set 8535:21169), in the order of the Select Add-Ons frames (8394:12743, 8727:38739): Policy excess
+// first in its own section, then the optional add-ons in one list. Prices are the motor team's (8727:38739).
 export type AddOnId = "ncd" | "excess" | "drivers" | "replacement" | "accessories" | "lossOfUse" | "breakdown";
 export const addOns: { id: AddOnId; title: string; price: string; description: string }[] = [
   {
-    id: "ncd",
-    title: "No claim discount (NCD) protector",
-    price: "S$168.00",
-    description:
-      "Safeguard the No Claim Discount you have earned. Available when your NCD is 30% or above, this add-on keeps your discount intact at renewal even after a claim, so years of careful driving continue to reward you.",
-  },
-  {
     id: "excess",
     title: "Policy excess",
-    price: "From S$600.00",
+    price: "",
     description:
       "Choose the excess that suits you. This is the amount you contribute towards each claim: select a higher excess to lower your premium, or a lower excess to reduce your out-of-pocket cost when you claim.",
   },
@@ -124,53 +117,59 @@ export const addOns: { id: AddOnId; title: string; price: string; description: s
       "Share your car with confidence. Add family or friends as named drivers so they are fully covered behind the wheel, with your first two named drivers included at no extra cost.",
   },
   {
+    id: "ncd",
+    title: "No claim discount (NCD) protector",
+    // 10% of the plan premium, worked out per plan (addOnCost).
+    price: "",
+    description:
+      "Safeguard the No Claim Discount you have earned. Available when your NCD is 30% or above, this add-on keeps your discount intact at renewal even after a claim, so years of careful driving continue to reward you.",
+  },
+  {
     id: "lossOfUse",
     title: "Loss of use",
-    price: "S$58.00",
+    price: "S$86.00",
     description:
       "Stay mobile while your car is being repaired after an accident. This add-on provides a daily transport allowance towards taxis or a rental vehicle, so your routine carries on with minimal disruption.",
   },
   {
     id: "breakdown",
     title: "24 hours breakdown assistance",
-    price: "S$38.00",
+    price: "S$32.00",
     description:
       "Drive with confidence, knowing help is always within reach. Our 24 hour assistance covers towing, battery jump-starts, tyre changes and lockouts, whenever and wherever you need it.",
   },
   {
     id: "replacement",
     title: "New for old replacement",
-    price: "S$120.00",
+    price: "S$118.00",
     description:
       "Enjoy added peace of mind for your new vehicle. Should your car be stolen or declared a total loss within the eligible period, we will replace it with the same make and model rather than settle at its depreciated value.",
   },
   {
     id: "accessories",
     title: "Added accessories",
-    price: "S$65.00",
+    price: "S$77.00",
     description:
       "Extend your protection to the accessories that make your car your own. Non-standard fittings such as audio systems, rims and bodykits fall outside standard cover; this add-on safeguards them against loss or damage.",
   },
 ];
-// Dropdowns inside the selected add-ons (8535:21158, 8535:21159).
-export const excessOptions = ["S$600.00 (Default)", "S$1000.00", "S$1100.00", "S$1350.00", "S$1600.00", "S$2100.00"];
-export const namedDriverOptions = ["1 (free)", "2 (free)", "3 (+S$50.00)", "4 (+S$100.00)"];
+// Dropdown options: policy excess (8739:11294) and named drivers (8535:21169).
+export const excessOptions = ["S$500.00 (Default)", "S$1,250.00", "S$1,500.00", "S$2,000.00"];
+export const namedDriverOptions = ["1 (free)", "2 (free)", "3 (+S$40.00)", "4 (+S$80.00)"];
 
-// Premium change for a higher policy excess (estimates; 8697:12426 shows one option at –S$34.00).
-export const excessDiscount: Record<string, number> = {
-  "S$600.00 (Default)": 0,
-  "S$1000.00": -34,
-  "S$1100.00": -40,
-  "S$1350.00": -55,
-  "S$1600.00": -70,
-  "S$2100.00": -95,
-};
+// A higher policy excess takes a fixed percentage off the premium, which customers aren't shown. The rate hasn't been
+// given yet, so the premium doesn't change for now.
+export const excessRate: Record<string, number> = {};
 
-// What each add-on adds to the subtotal (all incl. GST). A higher policy excess lowers the premium; named drivers
-// cost what the dropdown says.
-export const addOnCost = (id: AddOnId, drivers: string, excess = "S$600.00 (Default)"): number => {
-  if (id === "excess") return excessDiscount[excess] ?? 0;
+// The NCD protector costs 10% of the plan premium (S$67.60 on Essential at S$676.00, 8727:38739).
+const ncdRate = 0.1;
+
+// What each add-on adds to the subtotal (all incl. GST), given the chosen plan's list price. Named drivers cost what
+// the dropdown says; the rest are fixed prices.
+export const addOnCost = (id: AddOnId, drivers: string, planList: number, excess = excessOptions[0]): number => {
+  if (id === "excess") return -Math.round(planList * (excessRate[excess] ?? 0) * 100) / 100;
   if (id === "drivers") return parseFloat(/\+S\$([\d.]+)/.exec(drivers)?.[1] ?? "0");
+  if (id === "ncd") return Math.round(planList * (1 - promoRate) * ncdRate * 100) / 100;
   return parseFloat(addOns.find((a) => a.id === id)!.price.replace("S$", ""));
 };
 export const addOnCount = (drivers: string) => parseInt(drivers, 10);

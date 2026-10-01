@@ -5,6 +5,7 @@ import { defaultEndDate, emptyPolicy, type Policy } from "./components/PolicySec
 import {
   addOnCost,
   addOnCount,
+  excessOptions,
   addOns,
   plans,
   powerByMake,
@@ -34,8 +35,8 @@ const pageFromHash = (): Page => {
 };
 
 const emptyVehicle: ManualVehicle = { regNo: "", power: "" };
-// Policy excess is always part of the policy, at S$600.00 unless changed; no optional add-on is on to start.
-const emptyAddOns: AddOnState = { selected: [], excess: "S$600.00 (Default)", drivers: "1 (free)" };
+// Policy excess is always part of the policy, at S$500.00 unless changed; no optional add-on is on to start.
+const emptyAddOns: AddOnState = { selected: [], excess: excessOptions[0], drivers: "1 (free)" };
 
 // Picking or typing a full start date fills the end date 365 days later (the user can still change it within
 // 9 to 18 months); an incomplete start date clears it.
@@ -51,12 +52,12 @@ function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
 
 // A chosen add-on in the price summary: the right column is always an amount (8398:39153), e.g.
 // "Additional named drivers (x1)  Free".
-function addOnRow(id: (typeof addOns)[number]["id"], title: string, s: AddOnState) {
+function addOnRow(id: (typeof addOns)[number]["id"], title: string, s: AddOnState, planList: number) {
   if (id === "drivers") {
-    const cost = addOnCost(id, s.drivers);
+    const cost = addOnCost(id, s.drivers, planList);
     return { label: `${title} (x${addOnCount(s.drivers)})`, value: cost ? money(cost) : "Free" };
   }
-  return { label: title, value: money(addOnCost(id, s.drivers, s.excess)) };
+  return { label: title, value: money(addOnCost(id, s.drivers, planList, s.excess)) };
 }
 
 export default function App() {
@@ -105,9 +106,10 @@ export default function App() {
   const picked = addOns.filter((a) => addOnState.selected.includes(a.id));
   // The plan's premium after the chosen policy excess (a higher excess lowers it), then the subtotal: that premium
   // plus every paid add-on, updated as add-ons are switched on and off.
-  const premium = chosenPlan.list + addOnCost("excess", addOnState.drivers, addOnState.excess);
-  const subtotal = premium + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers, addOnState.excess), 0);
-  const chosenAddOns = picked.map((a) => addOnRow(a.id, a.title, addOnState));
+  const premium = chosenPlan.list + addOnCost("excess", addOnState.drivers, chosenPlan.list, addOnState.excess);
+  const subtotal =
+    premium + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers, chosenPlan.list, addOnState.excess), 0);
+  const chosenAddOns = picked.map((a) => addOnRow(a.id, a.title, addOnState, chosenPlan.list));
   const driverCount = addOnState.selected.includes("drivers") ? parseInt(addOnState.drivers, 10) : 0;
 
   const summary = <HeaderSummary make={make} period={period} onEdit={() => go(formPage)} />;
@@ -200,6 +202,7 @@ export default function App() {
       <AddOnsScreen
         summary={summary}
         priceSummary={priceSummary("addons")}
+        planList={chosenPlan.list}
         state={addOnState}
         onChange={(s) => setAddOnState((prev) => ({ ...prev, ...s }))}
         onBack={() => go("plan")}

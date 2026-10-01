@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle, Switch } from "../components/Flow";
 import { Dropdown } from "../components/Form";
-import { addOnCost, addOns, excessOptions, namedDriverOptions, type AddOnId } from "../data/mock";
+import { addOnCost, addOns, excessOptions, money, namedDriverOptions, type AddOnId } from "../data/mock";
 
 const icons: Record<AddOnId, string> = {
   ncd: assets.addonNcd,
@@ -22,6 +22,7 @@ export type AddOnState = { selected: AddOnId[]; excess: string; drivers: string 
 export default function AddOns({
   summary,
   priceSummary,
+  planList,
   state,
   onChange,
   onBack,
@@ -29,6 +30,7 @@ export default function AddOns({
 }: {
   summary: ReactNode;
   priceSummary: ReactNode;
+  planList: number;
   state: AddOnState;
   onChange: (s: Partial<AddOnState>) => void;
   onBack: () => void;
@@ -63,7 +65,7 @@ export default function AddOns({
         <div className="flex w-full flex-[1_0_auto] items-start gap-[24px]">
           <div className="flex min-w-px flex-[1_0_0] flex-col items-start justify-between gap-[24px] self-stretch">
             <div className="flex w-full flex-col items-start gap-[32px]">
-              {/* Policy excess is part of every policy: no switch, and its amount dropdown always shows (S$600.00 by
+              {/* Policy excess is part of every policy: no switch, and its amount dropdown always shows (S$500.00 by
                   default). It sits above the optional add-ons so its menu floats over them. */}
               <div className="relative z-[20] flex w-full flex-col items-start gap-[24px]">
                 <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Your policy excess</p>
@@ -94,9 +96,15 @@ export default function AddOns({
                 <div ref={listRef} className="flex w-full flex-col items-start gap-[24px]" style={{ paddingBottom: room }}>
                   {optional.map((a, i) => {
                     const on = state.selected.includes(a.id);
-                    // Named drivers show what the chosen number costs ("Free" for 1 or 2).
-                    const driversCost = addOnCost("drivers", state.drivers);
-                    const price = on && a.id === "drivers" && driversCost ? `S$${driversCost.toFixed(2)}` : a.price;
+                    // Named drivers show what the chosen number costs ("Free" for 1 or 2); the NCD protector is 10%
+                    // of the chosen plan's premium.
+                    const driversCost = addOnCost("drivers", state.drivers, planList);
+                    const price =
+                      a.id === "ncd"
+                        ? money(addOnCost("ncd", state.drivers, planList))
+                        : on && a.id === "drivers" && driversCost
+                          ? money(driversCost)
+                          : a.price;
                     return (
                       <div
                         key={a.id}

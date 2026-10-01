@@ -23,16 +23,13 @@ browser's Back and Forward buttons work.
 | `#manual` | `8636:3287` … | The Retrieve with Singpass card sits on top (goes through consent into the Singpass form); vehicle details keyed in. Picking a make fills in and locks its power rating (kW, electric) or engine capacity (cc): the 8 makes drawn in Figma plus 30 common Singapore models added as examples (`src/data/mock.ts`, figures from manufacturers' specs, not UOI's list). |
 | `#loading` | `8391:11773` | After **Check Price**: spinner for 2 seconds, then Select Plan (the loading page is skipped by Back). |
 | `#plan` | `8391:11581` | Essential is selected by default; **Select** moves the selection and the column highlight. **View Plan Comparison** opens a dialog laid out like the UniTravel one (InsureTravel `4326:32850`) with the benefits table from the UniCar policy wording (Preferred = Comprehensive Plus, Essential = Comprehensive Value). **Next: Add-Ons**. |
-| `#addons` | `8394:12743`, `8398:39153` | "Your policy excess" first: always included, no switch, amount dropdown at S$600.00 by default. Then every optional add-on in one list (no tabs). Each switch turns its card to the Selected variant; Additional named drivers shows its dropdown, which floats over the cards below and makes room above the buttons. The price summary doesn't list the excess (it isn't a charge); the plan's premium reflects it, and the chosen add-ons are listed below. The button reads **Next: Driver Details**. |
+| `#addons` | `8394:12743`, `8398:39153` | "Your policy excess" first: always included, no switch, amount dropdown at S$500.00 by default. Then every optional add-on in one list (no tabs). Each switch turns its card to the Selected variant; Additional named drivers shows its dropdown, which floats over the cards below and makes room above the buttons. The price summary doesn't list the excess (it isn't a charge); the plan's premium reflects it, and the chosen add-ons are listed below. The button reads **Next: Driver Details**. |
 | `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. Date of birth uses the purchase-flow picker: month and year grids from the header, no future dates. |
 | `#review` | `8394:15430`, `8394:15715` | Everything entered so far, with Edit links back to Driver Details. **Confirm & Pay** works once the declaration is ticked. The 2C2P / Visa OTP screen in `8697:12426` is left out. |
 | `#confirmation` | `8600:17327` | Thank-you page with LottieFiles' free "Successful" animation (played once) in the success slot; its buttons and "here" have no destination in the design. |
 
 The summary bar shows the car and the policy dates entered on the form (the Figma values if left empty); its **Edit**
-and "Your Car" **Edit** go back to the form, "Your Plan" **Edit** to Select Plan. Prices are estimates (UniCar premiums are quoted per
-car and driver and aren't published), all incl. GST: plans S$2,180 / 1,690 / 1,150 / 820 before the 60% promo; add-ons
-NCD protector S$168, New for old S$120, Accessories S$65, Loss of use S$58, 24h breakdown S$38, drivers 3 and 4 +S$50 /
-+S$100; a higher excess lowers the premium (S$1000 –S$34 … S$2100 –S$95). Price summary: subtotal = plan + add-ons
+and "Your Car" **Edit** go back to the form, "Your Plan" **Edit** to Select Plan. Plan prices are estimates (UniCar premiums are quoted per car and driver and aren't published), all incl. GST: S$2,180 / 1,690 / 1,150 / 820 before the 60% promo. Add-on prices are the motor team's (8727:38739): NCD protector 10% of the plan premium (S$67.60 on Essential), Loss of use S$86, 24h breakdown S$32, New for old S$118, Accessories S$77, named drivers 1–2 free, 3 +S$40, 4 +S$80. Policy excess S$500 (default), S$1,250, S$1,500 or S$2,000; a higher excess takes a fixed, unshown percentage off the premium (rate to be confirmed, so no change yet). Price summary: subtotal = plan + add-ons
 (updated live), minus the 60% promo = total. "Add-On(s)" **Edit** turns blue once an add-on is chosen and goes to Add-Ons.
 *policy wording* on Select Plan opens the UniCar policy PDF in a new tab.
 
@@ -60,7 +57,7 @@ date that no longer fits.
   can still be changed within 9 to 18 months.
 - "Are you the main driver?" (default Yes) comes before "Do you drive at work?", which is only asked (here, on Driver
   Details and on Review) when the answer is Yes. Additional drivers aren't asked about driving at work.
-- Policy excess is always part of the policy (S$600.00 unless changed), so its card has no switch.
+- Policy excess is always part of the policy (S$500.00 unless changed), so its card has no switch.
 
 ## Date picker
 Uses the UOI DS Date Picker "expanded" variants (start-date `1276:3259`, end-date `1276:3256`) at the DS size
