@@ -122,11 +122,9 @@ export default function App() {
             ]
           : undefined
       }
-      // Policy excess sits under Your Plan with the excess amount on the right (8394:12743).
-      plan={[
-        { label: chosenPlan.name, value: money(premium) },
-        { label: "Policy excess", value: addOnState.excess.replace(" (Default)", "") },
-      ]}
+      // The excess is what the customer pays towards a claim, not a charge, so it is not listed; the plan's premium
+      // already reflects it.
+      plan={[{ label: chosenPlan.name, value: money(premium) }]}
       addOns={chosenAddOns}
       subtotal={subtotal}
       promoRate={promoRate}
