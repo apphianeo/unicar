@@ -27,8 +27,8 @@ function Section({ title, fields, onEdit }: { title: string; fields: Field[]; on
   );
 }
 
-// T&C links are underlined so they read as links, as in the purchase-flow declaration.
-const termsLink = "text-primary-sureblue underline underline-offset-2";
+// T&C links in link blue (8394:15706).
+const termsLink = "text-primary-sureblue";
 
 const declarations: ReactNode[] = [
   "All the data/ information provided in this electronic proposal are true and that I have not misstated or suppressed any material facts",
@@ -87,16 +87,20 @@ export default function Review({
                 <Section key={i} title={`Additional driver ${i + 1} details`} fields={d} onEdit={onEditDrivers} />
               ))}
               <Section title="Vehicle details" fields={vehicle} onEdit={onEditVehicle} />
+              {/* Terms & Conditions (8394:15705): titled card, declarations in a bordered box at 14px, then the checkbox. */}
               <section className="flex w-full flex-col items-start gap-[24px] rounded-[12px] bg-bg-white p-[16px] drop-shadow-overlay">
-                <div className="w-full text-[16px] font-normal leading-[1.5] text-text-primary">
-                  <p>I confirm that:</p>
-                  <ul className="list-disc">
-                    {declarations.map((d, i) => (
-                      <li key={i} className="ms-[24px]">
-                        {d}
-                      </li>
-                    ))}
-                  </ul>
+                <p className="whitespace-nowrap text-[20px] font-semibold leading-[1.2] text-text-primary">Terms &amp; Conditions</p>
+                <div className="flex w-full items-center justify-center rounded-[8px] border border-solid border-line p-[16px]">
+                  <div className="min-w-px flex-[1_0_0] text-[14px] font-normal leading-[1.5] text-text-primary">
+                    <p>I confirm that:</p>
+                    <ul className="list-disc">
+                      {declarations.map((d, i) => (
+                        <li key={i} className="ms-[21px]">
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
                 <button
                   type="button"
