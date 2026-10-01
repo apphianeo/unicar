@@ -1,11 +1,47 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { assets } from "../assets";
 import { comparisonPlans, comparisonTabs } from "../data/planComparison";
 
 // Plan comparison dialog, laid out like the UniTravel one (InsureTravel file 4326:32850): title and close, category
 // chips, a sticky row of plan names, then benefit groups separated by lines. Content from the UniCar policy wording.
+// All benefits sit in one long scrolling table; the chips jump to their category and follow the scroll position.
 export function PlanComparisonDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [tab, setTab] = useState(comparisonTabs[0].tab);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  // While a chip's smooth scroll runs, keep that chip active instead of lighting up the sections passed on the way.
+  const jumping = useRef(0);
+
+  useEffect(() => {
+    if (open) setTab(comparisonTabs[0].tab);
+  }, [open]);
+
+  // Scroll so the category's first row sits just under the sticky plan names.
+  const jumpTo = (t: string) => {
+    const box = scrollRef.current;
+    const el = sectionRefs.current[t];
+    if (!box || !el) return;
+    const top = el.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - (stickyRef.current?.offsetHeight ?? 0);
+    window.clearTimeout(jumping.current);
+    jumping.current = window.setTimeout(() => (jumping.current = 0), 700);
+    box.scrollTo({ top, behavior: "smooth" });
+    setTab(t);
+  };
+
+  // The active chip is the last category whose top has reached the sticky row.
+  const onScroll = () => {
+    const box = scrollRef.current;
+    if (!box || jumping.current) return;
+    const line = box.getBoundingClientRect().top + (stickyRef.current?.offsetHeight ?? 0) + 1;
+    let current = comparisonTabs[0].tab;
+    for (const { tab: t } of comparisonTabs) {
+      const el = sectionRefs.current[t];
+      if (el && el.getBoundingClientRect().top <= line) current = t;
+    }
+    if (box.scrollTop + box.clientHeight >= box.scrollHeight - 1) current = comparisonTabs[comparisonTabs.length - 1].tab;
+    setTab(current);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -20,7 +56,7 @@ export function PlanComparisonDialog({ open, onClose }: { open: boolean; onClose
   }, [open, onClose]);
 
   if (!open) return null;
-  const groups = comparisonTabs.find((t) => t.tab === tab)!.groups;
+  const groups = comparisonTabs.flatMap(({ tab: t, groups }) => groups.map((g, k) => ({ ...g, anchor: k === 0 ? t : undefined })));
   const valueCell = "flex min-h-[40px] min-w-px flex-[1_0_0] items-center justify-center text-center text-[16px] font-medium leading-[1.5] text-text-primary";
 
   return (
@@ -49,7 +85,7 @@ export function PlanComparisonDialog({ open, onClose }: { open: boolean; onClose
                 <button
                   key={t}
                   type="button"
-                  onClick={() => setTab(t)}
+                  onClick={() => jumpTo(t)}
                   className={`flex cursor-pointer items-center justify-center rounded-[24px] px-[12px] py-[8px] text-center text-[14px] leading-[1.5] ${
                     active ? "bg-primary-sureblue font-medium text-white" : "border border-solid border-line bg-bg-white font-normal text-text-primary"
                   }`}
@@ -60,8 +96,8 @@ export function PlanComparisonDialog({ open, onClose }: { open: boolean; onClose
             })}
           </div>
         </div>
-        <div className="ds-scroll min-h-0 flex-[1_1_auto] overflow-y-auto">
-          <div className="sticky top-0 z-10 flex items-center bg-[#fafafa] px-[32px] py-[8px]">
+        <div ref={scrollRef} onScroll={onScroll} className="ds-scroll min-h-0 flex-[1_1_auto] overflow-y-auto">
+          <div ref={stickyRef} className="sticky top-0 z-10 flex items-center bg-[#fafafa] px-[32px] py-[8px]">
             <div className="h-[34px] w-[400px] shrink-0" />
             {comparisonPlans.map((p) => (
               <p key={p} className="min-w-px flex-[1_0_0] text-center text-[16px] font-semibold leading-[1.5] text-text-primary">
@@ -73,7 +109,10 @@ export function PlanComparisonDialog({ open, onClose }: { open: boolean; onClose
             {groups.map((g, i) => (
               <div key={g.title} className="flex w-full flex-col gap-[16px]">
                 {i > 0 && <div className="h-px w-full bg-[#e5e5e5]" />}
-                <div className="flex w-full flex-col gap-[4px]">
+                <div
+                  ref={g.anchor ? (el) => void (sectionRefs.current[g.anchor!] = el) : undefined}
+                  className="flex w-full flex-col gap-[4px]"
+                >
                   <div className="flex w-full items-center gap-px">
                     <p className="flex min-h-[40px] w-[400px] shrink-0 items-center text-[16px] font-bold leading-[1.5] text-text-primary">
                       {g.title}
