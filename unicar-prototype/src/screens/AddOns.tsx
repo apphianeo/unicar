@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle, Switch } from "../components/Flow";
 import { Dropdown } from "../components/Form";
-import { addOnCost, addOns, addOnTabs, excessOptions, namedDriverOptions, type AddOnId, type AddOnTab } from "../data/mock";
+import { addOnCost, addOns, excessOptions, namedDriverOptions, type AddOnId } from "../data/mock";
 
 const icons: Record<AddOnId, string> = {
   ncd: assets.addonNcd,
@@ -16,14 +16,12 @@ const icons: Record<AddOnId, string> = {
 
 export type AddOnState = { selected: AddOnId[]; excess: string; drivers: string };
 
-// Select Add-Ons: Recommended (8394:12743), Vehicle Maintenance (8394:37745), Mobility & Roadside Services (8394:38117).
-// Each card switches between the Default and Selected variants of 8535:21169; Policy excess and Additional named
-// drivers show their dropdown when selected (8535:21158, 8535:21159).
+// Select Add-Ons (8394:12743): "Your policy excess", always included with its amount dropdown, then every optional
+// add-on in one list. Each optional card switches between the Default and Selected variants of 8535:21169; Additional
+// named drivers shows its dropdown when selected (8535:21159).
 export default function AddOns({
   summary,
   priceSummary,
-  tab,
-  onTab,
   state,
   onChange,
   onBack,
@@ -31,8 +29,6 @@ export default function AddOns({
 }: {
   summary: ReactNode;
   priceSummary: ReactNode;
-  tab: AddOnTab;
-  onTab: (t: AddOnTab) => void;
   state: AddOnState;
   onChange: (s: Partial<AddOnState>) => void;
   onBack: () => void;
@@ -48,9 +44,10 @@ export default function AddOns({
     if (!list || !menu || !openMenu) return setRoom(0);
     setRoom(Math.max(0, Math.ceil(menu.getBoundingClientRect().bottom - (list.getBoundingClientRect().bottom - room))));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openMenu, tab]);
+  }, [openMenu]);
 
   const excessAddOn = addOns.find((a) => a.id === "excess")!;
+  const optional = addOns.filter((a) => a.id !== "excess");
 
   const toggle = (id: AddOnId, on: boolean) => {
     if (!on && openMenu === id) setOpenMenu(null);
@@ -65,12 +62,12 @@ export default function AddOns({
         </PageTitle>
         <div className="flex w-full flex-[1_0_auto] items-start gap-[24px]">
           <div className="flex min-w-px flex-[1_0_0] flex-col items-start justify-between gap-[24px] self-stretch">
-            <div className="flex w-full flex-col items-start gap-[24px]">
-              {/* Policy excess is part of every policy, so it sits above the optional add-ons as its own section: no switch,
-                  the amount always shown in its dropdown (S$600.00 by default). */}
-              <div className="relative z-[20] flex w-full flex-col items-start gap-[12px]">
+            <div className="flex w-full flex-col items-start gap-[32px]">
+              {/* Policy excess is part of every policy: no switch, and its amount dropdown always shows (S$600.00 by
+                  default). It sits above the optional add-ons so its menu floats over them. */}
+              <div className="relative z-[20] flex w-full flex-col items-start gap-[24px]">
                 <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Your policy excess</p>
-                <div className="flex w-full flex-col items-start justify-center rounded-[12px] border border-solid border-transparent bg-bg-white p-[16px] drop-shadow-overlay">
+                <div className="flex w-full flex-col items-start justify-center rounded-[12px] bg-bg-white p-[16px] drop-shadow-overlay">
                   <div className="flex w-full flex-col items-start gap-[12px]">
                     <div className="flex w-full items-center gap-[12px]">
                       <div className="flex size-[32px] shrink-0 items-center justify-center rounded-[8px] bg-bluebright-transparent">
@@ -79,6 +76,8 @@ export default function AddOns({
                       <p className="min-w-px flex-[1_0_0] text-[18px] font-semibold leading-[1.5] text-text-primary">{excessAddOn.title}</p>
                     </div>
                     <p className="w-full text-[14px] font-normal leading-[1.5] text-text-secondary">{excessAddOn.description}</p>
+                    {/* View coverage details has no destination in the design, so it is inert. */}
+                    <p className="whitespace-nowrap text-[12px] font-normal leading-[1.4] text-primary-sureblue">View coverage details</p>
                     <div className="flex w-full max-w-[320px] items-start">
                       <Dropdown
                         value={state.excess}
@@ -90,53 +89,19 @@ export default function AddOns({
                   </div>
                 </div>
               </div>
-              <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Optional add-ons</p>
-              {/* Tabs, size medium (8394:37568) */}
-              <div className="flex w-full items-start border-b border-solid border-line" role="tablist">
-                {addOnTabs.map((t) => {
-                  const active = t === tab;
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => onTab(t)}
-                      className="flex cursor-pointer flex-col items-center gap-[12px] px-[12px]"
-                    >
-                      <span className="h-0 w-full" />
-                      <span
-                        className={`whitespace-nowrap text-center text-[14px] leading-[1.5] ${active ? "font-medium text-primary-sureblue" : "font-normal text-text-primary"}`}
-                      >
-                        {t}
-                      </span>
-                      <span className="relative h-0 w-full">
-                        {active && <span className="absolute bottom-0 left-[-12px] right-[-12px] h-[2px] bg-primary-sureblue" />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              <div ref={listRef} className="flex w-full flex-col items-start gap-[24px]" style={{ paddingBottom: room }}>
-                {addOns
-                  .filter((a) => a.tab === tab && a.id !== "excess")
-                  .map((a, i, shown) => {
-                    // Policy excess is always included (S$600.00 by default); only its amount can change.
-                    const on = a.id === "excess" || state.selected.includes(a.id);
-                    // Selected Policy excess shows the chosen amount instead of "From S$600.00" (8398:39153); named drivers
-                    // show what the chosen number costs ("Free" for 1 or 2).
+              <div className="flex w-full flex-col items-start gap-[24px]">
+                <p className="whitespace-nowrap text-[18px] font-semibold leading-[1.5] text-text-primary">Optional add-ons</p>
+                <div ref={listRef} className="flex w-full flex-col items-start gap-[24px]" style={{ paddingBottom: room }}>
+                  {optional.map((a, i) => {
+                    const on = state.selected.includes(a.id);
+                    // Named drivers show what the chosen number costs ("Free" for 1 or 2).
                     const driversCost = addOnCost("drivers", state.drivers);
-                    const price =
-                      on && a.id === "excess"
-                        ? state.excess.replace(" (Default)", "")
-                        : on && a.id === "drivers" && driversCost
-                          ? `S$${driversCost.toFixed(2)}`
-                          : a.price;
+                    const price = on && a.id === "drivers" && driversCost ? `S$${driversCost.toFixed(2)}` : a.price;
                     return (
                       <div
                         key={a.id}
                         // Earlier cards sit above later ones, so an open menu floats over the cards below it.
-                        style={{ zIndex: shown.length - i }}
+                        style={{ zIndex: optional.length - i }}
                         className={`relative flex w-full flex-col items-start justify-center rounded-[12px] border border-solid bg-bg-white p-[16px] drop-shadow-overlay ${on ? "border-primary-sureblue" : "border-transparent"}`}
                       >
                         <div className="flex w-full flex-col items-start gap-[12px]">
@@ -149,20 +114,19 @@ export default function AddOns({
                             </div>
                             <div className="flex items-center justify-end gap-[12px]">
                               <p className="whitespace-nowrap text-[16px] font-semibold leading-[1.5] text-text-primary">{price}</p>
-                              {a.id !== "excess" && <Switch on={on} label={a.title} onChange={(v) => toggle(a.id, v)} />}
+                              <Switch on={on} label={a.title} onChange={(v) => toggle(a.id, v)} />
                             </div>
                           </div>
                           <p className="w-full text-[14px] font-normal leading-[1.5] text-text-secondary">{a.description}</p>
-                          {/* View coverage details has no destination in the design, so it is inert. */}
                           <p className="whitespace-nowrap text-[12px] font-normal leading-[1.4] text-primary-sureblue">
                             View coverage details
                           </p>
-                          {on && (a.id === "excess" || a.id === "drivers") && (
+                          {on && a.id === "drivers" && (
                             <div className="flex w-full max-w-[320px] items-start">
                               <Dropdown
-                                value={a.id === "excess" ? state.excess : state.drivers}
-                                options={a.id === "excess" ? excessOptions : namedDriverOptions}
-                                onSelect={(v) => onChange(a.id === "excess" ? { excess: v } : { drivers: v })}
+                                value={state.drivers}
+                                options={namedDriverOptions}
+                                onSelect={(v) => onChange({ drivers: v })}
                                 onOpenChange={(open) => setOpenMenu(open ? a.id : null)}
                               />
                             </div>
@@ -171,11 +135,11 @@ export default function AddOns({
                       </div>
                     );
                   })}
+                </div>
               </div>
             </div>
-            {/* "Skip" with nothing selected (8394:12743), "Next: Driver Details" once an optional add-on is on (8398:39153). */}
             <FlowActions
-              next={state.selected.some((id) => id !== "excess") ? "Next: Driver Details" : "Skip"}
+              next="Next: Driver Details"
               onBack={onBack}
               onNext={onNext}
             />

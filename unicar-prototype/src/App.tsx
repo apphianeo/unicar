@@ -13,7 +13,6 @@ import {
   money,
   promoRate,
   singpassVehicle,
-  type AddOnTab,
   type PlanId,
 } from "./data/mock";
 import AddOnsScreen, { type AddOnState } from "./screens/AddOns";
@@ -35,8 +34,8 @@ const pageFromHash = (): Page => {
 };
 
 const emptyVehicle: ManualVehicle = { regNo: "", power: "" };
-// Policy excess is always part of the policy, at S$600.00 unless changed.
-const emptyAddOns: AddOnState = { selected: ["excess"], excess: "S$600.00 (Default)", drivers: "1 (free)" };
+// Policy excess is always part of the policy, at S$600.00 unless changed; no optional add-on is on to start.
+const emptyAddOns: AddOnState = { selected: [], excess: "S$600.00 (Default)", drivers: "1 (free)" };
 
 // Picking or typing a full start date fills the end date 365 days later (the user can still change it within
 // 9 to 18 months); an incomplete start date clears it.
@@ -51,12 +50,8 @@ function applyPolicy(prev: Policy, p: Partial<Policy>): Policy {
 
 
 // A chosen add-on in the price summary: the right column is always an amount (8398:39153), e.g.
-// "Policy excess  S$600.00", "Additional named drivers (x1)  Free".
+// "Additional named drivers (x1)  Free".
 function addOnRow(id: (typeof addOns)[number]["id"], title: string, s: AddOnState) {
-  if (id === "excess") {
-    const cost = addOnCost(id, s.drivers, s.excess);
-    return { label: `${title} (${s.excess.replace(" (Default)", "")})`, value: money(cost) };
-  }
   if (id === "drivers") {
     const cost = addOnCost(id, s.drivers);
     return { label: `${title} (x${addOnCount(s.drivers)})`, value: cost ? money(cost) : "Free" };
@@ -74,7 +69,6 @@ export default function App() {
   const [policy, setPolicy] = useState<Policy>(emptyPolicy);
   // Essential is the plan selected by default in 8391:11581.
   const [plan, setPlan] = useState<PlanId>("essential");
-  const [addOnTab, setAddOnTab] = useState<AddOnTab>("Recommended");
   const [addOnState, setAddOnState] = useState<AddOnState>(emptyAddOns);
   const [extraDrivers, setExtraDrivers] = useState<ExtraDriver[]>([]);
   const [brandNew, setBrandNew] = useState<YesNo>("No");
@@ -109,9 +103,10 @@ export default function App() {
     policy.startDate && policy.endDate ? `${policy.startDate} - ${policy.endDate}` : "02/01/2026 - 01/01/2027";
   const chosenPlan = plans.find((p) => p.id === plan)!;
   const picked = addOns.filter((a) => addOnState.selected.includes(a.id));
-  // Subtotal: the plan plus every paid add-on, updated as add-ons are switched on and off.
-  const subtotal =
-    chosenPlan.list + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers, addOnState.excess), 0);
+  // The plan's premium after the chosen policy excess (a higher excess lowers it), then the subtotal: that premium
+  // plus every paid add-on, updated as add-ons are switched on and off.
+  const premium = chosenPlan.list + addOnCost("excess", addOnState.drivers, addOnState.excess);
+  const subtotal = premium + picked.reduce((sum, a) => sum + addOnCost(a.id, addOnState.drivers, addOnState.excess), 0);
   const chosenAddOns = picked.map((a) => addOnRow(a.id, a.title, addOnState));
   const driverCount = addOnState.selected.includes("drivers") ? parseInt(addOnState.drivers, 10) : 0;
 
@@ -127,7 +122,11 @@ export default function App() {
             ]
           : undefined
       }
-      plan={{ label: chosenPlan.name, value: money(chosenPlan.list) }}
+      // Policy excess sits under Your Plan with the excess amount on the right (8394:12743).
+      plan={[
+        { label: chosenPlan.name, value: money(premium) },
+        { label: "Policy excess", value: addOnState.excess.replace(" (Default)", "") },
+      ]}
       addOns={chosenAddOns}
       subtotal={subtotal}
       promoRate={promoRate}
@@ -203,8 +202,6 @@ export default function App() {
       <AddOnsScreen
         summary={summary}
         priceSummary={priceSummary("addons")}
-        tab={addOnTab}
-        onTab={setAddOnTab}
         state={addOnState}
         onChange={(s) => setAddOnState((prev) => ({ ...prev, ...s }))}
         onBack={() => go("plan")}

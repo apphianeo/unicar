@@ -201,7 +201,7 @@ export function PriceSummary({
 }: {
   variant: "addons" | "driver";
   car?: SummaryRow[];
-  plan: SummaryRow;
+  plan: SummaryRow[];
   addOns: SummaryRow[];
   subtotal: number;
   promoRate: number;
@@ -264,7 +264,7 @@ export function PriceSummary({
               {line}
             </>
           )}
-          <Section title={driver ? "Your plan" : "Your Plan"} onEdit={onEditPlan} rows={rows([plan])} gap="gap-[12px]" />
+          <Section title={driver ? "Your plan" : "Your Plan"} onEdit={onEditPlan} rows={rows(plan)} gap="gap-[12px]" />
           <Section
             title={driver ? "Add-on(s)" : "Add-On(s)"}
             onEdit={addOns.length ? onEditAddOns : undefined}

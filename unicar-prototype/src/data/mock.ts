@@ -98,14 +98,12 @@ export const policyWordingUrl = "https://www.uoi.com.sg/assets/web-resources/uoi
 export const geographicalArea =
   "Geographical area includes Singapore, West Malaysia, Southern Thailand (up to 80km from West Malaysia), Straits between Singapore and Tanjong Belungkor (Johor)";
 
-// Add-ons (component set 8535:21169), by tab (8394:12743, 8394:37745, 8394:38117).
+// Add-ons (component set 8535:21169), in the order of the Select Add-Ons frame (8394:12743): Policy excess first in its
+// own section, then the optional add-ons in one list.
 export type AddOnId = "ncd" | "excess" | "drivers" | "replacement" | "accessories" | "lossOfUse" | "breakdown";
-export const addOnTabs = ["Recommended", "Vehicle Maintenance", "Mobility & Roadside Services"] as const;
-export type AddOnTab = (typeof addOnTabs)[number];
-export const addOns: { id: AddOnId; tab: AddOnTab; title: string; price: string; description: string }[] = [
+export const addOns: { id: AddOnId; title: string; price: string; description: string }[] = [
   {
     id: "ncd",
-    tab: "Recommended",
     title: "No claim discount (NCD) protector",
     price: "S$168.00",
     description:
@@ -113,7 +111,6 @@ export const addOns: { id: AddOnId; tab: AddOnTab; title: string; price: string;
   },
   {
     id: "excess",
-    tab: "Recommended",
     title: "Policy excess",
     price: "From S$600.00",
     description:
@@ -121,31 +118,13 @@ export const addOns: { id: AddOnId; tab: AddOnTab; title: string; price: string;
   },
   {
     id: "drivers",
-    tab: "Recommended",
     title: "Additional named drivers",
     price: "Free",
     description:
       "Share your car with confidence. Add family or friends as named drivers so they are fully covered behind the wheel, with your first two named drivers included at no extra cost.",
   },
   {
-    id: "replacement",
-    tab: "Vehicle Maintenance",
-    title: "New for old replacement",
-    price: "S$120.00",
-    description:
-      "Enjoy added peace of mind for your new vehicle. Should your car be stolen or declared a total loss within the eligible period, we will replace it with the same make and model rather than settle at its depreciated value.",
-  },
-  {
-    id: "accessories",
-    tab: "Vehicle Maintenance",
-    title: "Added accessories",
-    price: "S$65.00",
-    description:
-      "Extend your protection to the accessories that make your car your own. Non-standard fittings such as audio systems, rims and bodykits fall outside standard cover; this add-on safeguards them against loss or damage.",
-  },
-  {
     id: "lossOfUse",
-    tab: "Mobility & Roadside Services",
     title: "Loss of use",
     price: "S$58.00",
     description:
@@ -153,11 +132,24 @@ export const addOns: { id: AddOnId; tab: AddOnTab; title: string; price: string;
   },
   {
     id: "breakdown",
-    tab: "Mobility & Roadside Services",
     title: "24 hours breakdown assistance",
     price: "S$38.00",
     description:
       "Drive with confidence, knowing help is always within reach. Our 24 hour assistance covers towing, battery jump-starts, tyre changes and lockouts, whenever and wherever you need it.",
+  },
+  {
+    id: "replacement",
+    title: "New for old replacement",
+    price: "S$120.00",
+    description:
+      "Enjoy added peace of mind for your new vehicle. Should your car be stolen or declared a total loss within the eligible period, we will replace it with the same make and model rather than settle at its depreciated value.",
+  },
+  {
+    id: "accessories",
+    title: "Added accessories",
+    price: "S$65.00",
+    description:
+      "Extend your protection to the accessories that make your car your own. Non-standard fittings such as audio systems, rims and bodykits fall outside standard cover; this add-on safeguards them against loss or damage.",
   },
 ];
 // Dropdowns inside the selected add-ons (8535:21158, 8535:21159).
