@@ -31,10 +31,10 @@
   --button-disabled-bg: #e0e0e0; /* Buttons type=primary disabled (8723:26351) */
 }
 
-/* Always reserve the scrollbar's space, so the page doesn't jump sideways when content grows past the window
-   (e.g. switching on add-ons that show a dropdown). */
+/* Always show the page scrollbar (its track sits idle on short pages), so the page doesn't jump sideways when content
+   grows past the window (e.g. switching on add-ons that show a dropdown). */
 html {
-  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 html,
