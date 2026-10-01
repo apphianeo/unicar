@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, GreenBadge, PageTitle } from "../components/Flow";
 import { InfoAlert } from "../components/Form";
+import { PlanComparisonDialog } from "../components/PlanComparisonDialog";
 import { benefits, geographicalArea, money, policyWordingUrl, promoRate, planDiscountBadge, plans, type PlanId } from "../data/mock";
 
 // Heights of the benefit rows (8394:14876 …): "Own damage - the motor vehicle" wraps to two lines.
@@ -21,8 +22,10 @@ export default function SelectPlan({
   onBack: () => void;
   onNext: () => void;
 }) {
+  const [comparing, setComparing] = useState(false);
   return (
     <FlowShell step={1} summary={summary}>
+      <PlanComparisonDialog open={comparing} onClose={() => setComparing(false)} />
       <div className="flex w-full max-w-[1200px] flex-col items-start gap-[60px]">
         <div className="flex w-full flex-col items-start gap-[24px]">
           <PageTitle title="Select Plan">
@@ -118,14 +121,17 @@ export default function SelectPlan({
 
           <InfoAlert>{geographicalArea}</InfoAlert>
 
-          {/* View Plan Comparison has no destination in the design, so it is inert. */}
           <div className="flex w-full flex-col items-start gap-[8px]">
-            <div className="flex h-[32px] items-center gap-[8px] rounded-[12px]">
-              <p className="whitespace-nowrap text-center text-[14px] font-medium leading-[1.5] text-primary-sureblue">
+            <button
+              type="button"
+              onClick={() => setComparing(true)}
+              className="flex h-[32px] cursor-pointer items-center gap-[8px] rounded-[12px]"
+            >
+              <span className="whitespace-nowrap text-center text-[14px] font-medium leading-[1.5] text-primary-sureblue">
                 View Plan Comparison
-              </p>
+              </span>
               <img src={assets.icForward} alt="" width={24} height={24} className="size-[24px]" />
-            </div>
+            </button>
             <p className="flex h-[32px] items-center text-[14px] font-normal leading-[1.5] text-text-secondary">
               For full summary, please refer to&nbsp;
               <a href={policyWordingUrl} target="_blank" rel="noopener noreferrer" className="text-primary-sureblue">

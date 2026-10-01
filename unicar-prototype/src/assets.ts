@@ -46,6 +46,7 @@ import icUp24 from "./assets/ic-up-24.svg";
 import calendarDisabled from "./assets/calendar-disabled.svg";
 import checkboxOff from "./assets/checkbox-off.svg";
 import checkboxOn from "./assets/checkbox-on.svg";
+import icClose24 from "./assets/ic-close-24.svg";
 
 export const assets = {
   logo,
@@ -94,4 +95,5 @@ export const assets = {
   calendarDisabled,
   checkboxOff,
   checkboxOn,
+  icClose24,
 };

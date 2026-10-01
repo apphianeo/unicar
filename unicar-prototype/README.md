@@ -22,7 +22,7 @@ browser's Back and Forward buttons work.
 | `#quote` after Clear Form | `8642:19917` | Every field (vehicle, off-peak, policy details) is emptied; the card offers **Retrieve with Singpass**, which goes through consent again. |
 | `#manual` | `8636:3287` … | The Retrieve with Singpass card sits on top (goes through consent into the Singpass form); vehicle details keyed in. Picking a make fills in and locks its power rating (kW, electric) or engine capacity (cc): the 8 makes drawn in Figma plus 30 common Singapore models added as examples (`src/data/mock.ts`, figures from manufacturers' specs, not UOI's list). |
 | `#loading` | `8391:11773` | After **Check Price**: spinner for 2 seconds, then Select Plan (the loading page is skipped by Back). |
-| `#plan` | `8391:11581` | Essential is selected by default; **Select** moves the selection and the column highlight. **Next: Add-Ons**. |
+| `#plan` | `8391:11581` | Essential is selected by default; **Select** moves the selection and the column highlight. **View Plan Comparison** opens a dialog laid out like the UniTravel one (InsureTravel `4326:32850`) with the benefits table from the UniCar policy wording (Preferred = Comprehensive Plus, Essential = Comprehensive Value). **Next: Add-Ons**. |
 | `#addons` | `8394:12743`, `8394:37745`, `8394:38117`, `8398:39153` | Three tabs. Each switch turns its card to the Selected variant; Policy excess (price then shows the chosen amount) and Additional named drivers show their dropdown, which floats over the cards below and makes room above the buttons. The price summary lists the chosen add-ons with an amount on the right. The button reads **Skip**, or **Next: Driver Details** once an add-on is on. |
 | `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. Date of birth uses the purchase-flow picker: month and year grids from the header, no future dates. |
 | `#review` | `8394:15430`, `8394:15715` | Everything entered so far, with Edit links back to Driver Details. **Confirm & Pay** works once the declaration is ticked. The 2C2P / Visa OTP screen in `8697:12426` is left out. |
@@ -69,7 +69,7 @@ the arrows change the month, and picking a day fills `DD/MM/YYYY`. The end-date 
 The month and year carets have no designed menu, so they are labels only.
 
 ## Not in the design, so left inert or empty
-- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, *Save Draft*, *View Plan Comparison*,
+- *Need Assistance?*, *Have an Agent ID?*, *Terms of Use*, promo *Apply* and its ✕, *Save Draft*,
   *View coverage details*, the discount chip's ✕, the section chevrons on Driver Details, and
   *Next: Review & Pay* (next flow).
 - Text inputs use the Dropdown "focused" look (blue border with a 3px ring) when focused.
