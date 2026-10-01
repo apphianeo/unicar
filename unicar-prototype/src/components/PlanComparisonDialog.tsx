@@ -60,7 +60,7 @@ export function PlanComparisonDialog({ open, onClose }: { open: boolean; onClose
             })}
           </div>
         </div>
-        <div className="ds-scroll min-h-px flex-[1_0_0] overflow-y-auto">
+        <div className="ds-scroll min-h-0 flex-[1_1_auto] overflow-y-auto">
           <div className="sticky top-0 z-10 flex items-center bg-[#fafafa] px-[32px] py-[8px]">
             <div className="h-[34px] w-[400px] shrink-0" />
             {comparisonPlans.map((p) => (
