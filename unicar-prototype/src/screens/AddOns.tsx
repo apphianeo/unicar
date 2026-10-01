@@ -101,7 +101,7 @@ export default function AddOns({
                     const driversCost = addOnCost("drivers", state.drivers, planList);
                     const price =
                       a.id === "ncd"
-                        ? money(addOnCost("ncd", state.drivers, planList))
+                        ? money(addOnCost("ncd", state.drivers, planList, state.excess))
                         : on && a.id === "drivers" && driversCost
                           ? money(driversCost)
                           : a.price;

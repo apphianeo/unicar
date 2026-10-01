@@ -157,9 +157,9 @@ export const addOns: { id: AddOnId; title: string; price: string; description: s
 export const excessOptions = ["S$500.00 (Default)", "S$1,250.00", "S$1,500.00", "S$2,000.00"];
 export const namedDriverOptions = ["1 (free)", "2 (free)", "3 (+S$40.00)", "4 (+S$80.00)"];
 
-// A higher policy excess takes a fixed percentage off the premium, which customers aren't shown. The rate hasn't been
-// given yet, so the premium doesn't change for now.
-export const excessRate: Record<string, number> = {};
+// A higher policy excess takes a fixed percentage off the plan premium, which customers aren't shown. Placeholder
+// rates until the motor team confirms them.
+export const excessRate: Record<string, number> = { "S$1,250.00": 0.05, "S$1,500.00": 0.075, "S$2,000.00": 0.1 };
 
 // The NCD protector costs 10% of the plan premium (S$67.60 on Essential at S$676.00, 8727:38739).
 const ncdRate = 0.1;
@@ -169,7 +169,8 @@ const ncdRate = 0.1;
 export const addOnCost = (id: AddOnId, drivers: string, planList: number, excess = excessOptions[0]): number => {
   if (id === "excess") return -Math.round(planList * (excessRate[excess] ?? 0) * 100) / 100;
   if (id === "drivers") return parseFloat(/\+S\$([\d.]+)/.exec(drivers)?.[1] ?? "0");
-  if (id === "ncd") return Math.round(planList * (1 - promoRate) * ncdRate * 100) / 100;
+  // The premium the NCD protector is priced on is the plan after any excess reduction and the promo.
+  if (id === "ncd") return Math.round(planList * (1 - (excessRate[excess] ?? 0)) * (1 - promoRate) * ncdRate * 100) / 100;
   return parseFloat(addOns.find((a) => a.id === id)!.price.replace("S$", ""));
 };
 export const addOnCount = (drivers: string) => parseInt(drivers, 10);
