@@ -144,6 +144,8 @@ export function PolicySection({
                 value={policy.startDate}
                 error={err("startDate", !parseDate(policy.startDate))}
                 initialMonth={today}
+                // No backdating: today is the earliest start date.
+                minDate={today}
                 onChange={(startDate) => onPolicy({ startDate })}
               />
               <DateField
