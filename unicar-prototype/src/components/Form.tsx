@@ -106,6 +106,8 @@ type DropdownProps = {
   onOpenChange?: (open: boolean) => void;
   // Closed chevron colour differs per slot in the frames (#6E6E6E or #949494).
   chevron?: ChevronTone;
+  // Inline error message (shown after Check Price is pressed with this field empty).
+  error?: string;
 };
 
 // Dropdown (Input field closed 69:7919, filled 90:1007, disabled 69:7952,
@@ -122,6 +124,7 @@ export function Dropdown({
   onOpen,
   onOpenChange,
   chevron = "default",
+  error,
 }: DropdownProps) {
   const [open, setOpenState] = useState(false);
   const setOpen = (v: boolean) => {
@@ -166,7 +169,7 @@ export function Dropdown({
             if (!open) onOpen?.();
             setOpen(!open);
           }}
-          className={`${fieldBox} ${look} ${canOpen ? "cursor-pointer" : "cursor-default"} text-left`}
+          className={`${fieldBox} ${look} ${canOpen ? "cursor-pointer" : "cursor-default"} ${error && !open ? errorBorder : ""} text-left`}
         >
           <span className={`min-w-px flex-[1_0_0] ${bodyText} ${text}`}>{value || "Please select"}</span>
           <img src={chevronIcon} alt="" width={16} height={16} className="size-[16px] shrink-0" />
@@ -206,6 +209,20 @@ export function Dropdown({
           </div>
         )}
       </div>
+      <FieldError message={error} />
+    </div>
+  );
+}
+
+// Error row under a field (Dropdown State=Error, UOI Design System 8724:27855): #DC2626 border on the field, then
+// 8px below it a 16px filled info icon and a 12px message in the error colour.
+const errorBorder = "!border-status-error";
+export function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <div data-field-error className="-mt-[4px] flex items-center gap-[8px]">
+      <img src={assets.infoError} alt="" width={16} height={16} className="size-[16px] shrink-0" />
+      <p className="text-[12px] font-normal leading-[1.4] text-status-error">{message}</p>
     </div>
   );
 }
@@ -218,10 +235,12 @@ export function TextField({
   disabled,
   disabledTone = "disabled",
   required,
+  error,
   onChange,
 }: {
   label: string;
   required?: boolean;
+  error?: string;
   placeholder: string;
   value: string;
   disabled?: boolean;
@@ -231,8 +250,8 @@ export function TextField({
 }) {
   return (
     <div className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
-      <InputHeader label={label} required={required} />
-      <div className={`${fieldBox} ${disabled ? "bg-disabled-bg" : `bg-bg-white ${focusRing}`}`}>
+      {label && <InputHeader label={label} required={required} />}
+      <div className={`${fieldBox} ${disabled ? "bg-disabled-bg" : `bg-bg-white ${focusRing}`} ${error ? errorBorder : ""}`}>
         <input
           value={value}
           disabled={disabled}
@@ -241,6 +260,7 @@ export function TextField({
           className={`min-w-px flex-[1_0_0] bg-transparent outline-none placeholder:text-text-tertiary ${bodyText} ${disabled ? (disabledTone === "tertiary" ? "text-text-tertiary" : "text-text-disabled") : "text-text-primary"}`}
         />
       </div>
+      <FieldError message={error} />
     </div>
   );
 }
@@ -435,10 +455,12 @@ export function DateField({
   pickMonthYear,
   initialMonth,
   helper,
+  error,
   onChange,
   onOpen,
 }: {
   label: string;
+  error?: string;
   info?: boolean;
   tooltip?: string;
   required?: boolean;
@@ -472,7 +494,7 @@ export function DateField({
     <div ref={ref} className="relative flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
       <InputHeader label={label} info={info} tooltip={tooltip} required={required} />
       <div className="relative w-full">
-      <div className={`${fieldBox} bg-bg-white ${open ? openRing : ""}`} onClick={() => { onOpen?.(); setOpen(true); }}>
+      <div className={`${fieldBox} bg-bg-white ${open ? openRing : error ? errorBorder : ""}`} onClick={() => { onOpen?.(); setOpen(true); }}>
         <input
           value={value}
           inputMode="numeric"
@@ -507,6 +529,7 @@ export function DateField({
         </div>
       )}
       </div>
+      <FieldError message={error} />
       {helper && <p className="w-full text-[12px] font-normal leading-[1.4] text-text-tertiary">{helper}</p>}
     </div>
   );

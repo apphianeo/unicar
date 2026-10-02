@@ -47,6 +47,8 @@ import calendarDisabled from "./assets/calendar-disabled.svg";
 import checkboxOff from "./assets/checkbox-off.svg";
 import checkboxOn from "./assets/checkbox-on.svg";
 import icClose24 from "./assets/ic-close-24.svg";
+// Error-row icon from the UOI Design System Dropdown State=Error variant (info, Property 1=filled, #DC2626).
+import infoError from "./assets/info-error.svg";
 
 export const assets = {
   logo,
@@ -96,4 +98,5 @@ export const assets = {
   checkboxOff,
   checkboxOn,
   icClose24,
+  infoError,
 };

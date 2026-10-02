@@ -1,7 +1,8 @@
 import { Dropdown, RadioGroup, TextField } from "../components/Form";
 import { ClearFormCard, RetrieveSingpassCard } from "../components/InfoCard";
 import { PageShell } from "../components/Layout";
-import { PolicySection, type Policy } from "../components/PolicySection";
+import { errors, PolicySection, type ErrorKey, type Policy } from "../components/PolicySection";
+import { useState } from "react";
 import { makeOptions, ncdOptions, powerByMake, singpassVehicle, tooltips, yearOptions } from "../data/mock";
 import { parseDate } from "../components/Form";
 
@@ -14,6 +15,7 @@ export type ManualVehicle = { regNo: string; make?: string; power: string; year?
 // - "cleared": after Clear Form. Vehicle details are keyed in; the card offers Retrieve with Singpass (8642:19917).
 // - "manual": Fill Manually from the landing page (8636:3287 onwards). Vehicle details are keyed in; the same
 //   Retrieve with Singpass card sits on top so the user can still switch to Singpass.
+
 export type FormMode = "singpass" | "cleared" | "manual";
 
 type Props = {
@@ -41,6 +43,31 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
     !!policy.claims &&
     !!parseDate(policy.startDate) &&
     !!parseDate(policy.endDate);
+  // Check Price is always the primary button. Pressed with fields still empty, it marks each visible empty field
+  // with an inline error and scrolls to the first one.
+  // Only fields that were on screen and empty at the press are flagged, so a section revealed afterwards starts clean.
+  const [flagged, setFlagged] = useState<ErrorKey[]>([]);
+  const err = (key: ErrorKey, empty: boolean) => (flagged.includes(key) && empty ? errors[key] : undefined);
+  const checkPrice = () => {
+    if (canCheckPrice) return onCheckPrice();
+    const showAboutYou = !!policy.ncd;
+    const showPolicy = showAboutYou && !!policy.experience && !!policy.claims;
+    const empty: Record<ErrorKey, boolean> = {
+      regNo: !filled && !vehicle.regNo,
+      make: !filled && !vehicle.make,
+      power: !filled && !(lockedPower ?? vehicle.power),
+      year: !filled && !vehicle.year,
+      ncd: !policy.ncd,
+      experience: showAboutYou && !policy.experience,
+      claims: showAboutYou && !policy.claims,
+      startDate: showPolicy && !parseDate(policy.startDate),
+      endDate: showPolicy && !parseDate(policy.endDate),
+    };
+    setFlagged((Object.keys(empty) as ErrorKey[]).filter((k) => empty[k]));
+    requestAnimationFrame(() =>
+      document.querySelector("[data-field-error]")?.scrollIntoView({ behavior: "smooth", block: "center" }),
+    );
+  };
 
   const form = (
     <div className="flex w-full flex-col items-end justify-center gap-[32px] rounded-[12px] bg-bg-white p-[16px] drop-shadow-overlay">
@@ -54,6 +81,7 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
               label="Vehicle registration number"
               placeholder="Enter vehicle registration number"
               value={vehicle.regNo}
+              error={err("regNo", !vehicle.regNo)}
               onChange={(regNo) => onVehicle({ regNo })}
             />
           )}
@@ -63,6 +91,7 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
             tooltip={tooltips.make}
             value={filled ? singpassVehicle.make : vehicle.make}
             disabled={filled}
+            error={err("make", !filled && !vehicle.make)}
             options={makeOptions}
             onSelect={(make) => onVehicle({ make, power: powerByMake[make] ?? "" })}
           />
@@ -74,6 +103,7 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
             value={filled ? singpassVehicle.power : (lockedPower ?? vehicle.power)}
             disabled={filled || !!lockedPower}
             disabledTone={filled ? "disabled" : "tertiary"}
+            error={err("power", !filled && !(lockedPower ?? vehicle.power))}
             onChange={(power) => onVehicle({ power })}
           />
           <Dropdown
@@ -82,16 +112,18 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
             tooltip={tooltips.year}
             value={filled ? singpassVehicle.year : vehicle.year}
             disabled={filled}
+            error={err("year", !filled && !vehicle.year)}
             options={yearOptions}
             onSelect={(year) => onVehicle({ year })}
           />
         </div>
-        <div className="flex h-[81px] w-full items-start gap-[24px]">
+        <div className="flex w-full items-start gap-[24px]">
           <Dropdown
             label="No claims discount (NCD)"
             info
             tooltip={tooltips.ncd}
             value={policy.ncd}
+            error={err("ncd", !policy.ncd)}
             options={ncdOptions}
             onSelect={(ncd) => onPolicy({ ncd })}
           />
@@ -100,7 +132,7 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
             tooltip={tooltips.offPeak}
             value={offPeak}
             onChange={onOffPeak}
-            className="h-full min-w-px flex-[1_0_0]"
+            className="h-[81px] min-w-px flex-[1_0_0]"
           />
         </div>
       </div>
@@ -108,15 +140,22 @@ export default function QuoteForm({ mode, vehicle, offPeak, policy, onVehicle, o
         policy={policy}
         onPolicy={onPolicy}
         showAboutYou={!!policy.ncd}
-        canCheckPrice={canCheckPrice}
-        onCheckPrice={onCheckPrice}
+        err={err}
+        onCheckPrice={checkPrice}
       />
     </div>
   );
 
   return (
     <PageShell>
-      {mode === "singpass" && <ClearFormCard onClear={onClearForm} />}
+      {mode === "singpass" && (
+        <ClearFormCard
+          onClear={() => {
+            setFlagged([]);
+            onClearForm();
+          }}
+        />
+      )}
       {(mode === "cleared" || mode === "manual") && <RetrieveSingpassCard onRetrieve={onRetrieve} />}
       {form}
     </PageShell>

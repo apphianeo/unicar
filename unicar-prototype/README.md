@@ -24,7 +24,7 @@ browser's Back and Forward buttons work.
 | `#loading` | `8391:11773` | After **Check Price**: spinner for 2 seconds, then Select Plan (the loading page is skipped by Back). |
 | `#plan` | `8391:11581` | Essential is selected by default; **Select** moves the selection and the column highlight. **View Plan Comparison** opens a dialog laid out like the UniTravel one (InsureTravel `4326:32850`) with the benefits table from the UniCar policy wording (Preferred = Comprehensive Plus, Essential = Comprehensive Value). **Next: Add-Ons**. |
 | `#addons` | `8394:12743`, `8398:39153` | "Your policy excess" first: always included, no switch, amount dropdown at S$500.00 by default. Then every optional add-on in one list (no tabs). Each switch turns its card to the Selected variant; Additional named drivers shows its dropdown, which floats over the cards below and makes room above the buttons. The price summary doesn't list the excess (it isn't a charge); the plan's premium reflects it, and the chosen add-ons are listed below. The button reads **Next: Driver Details**. |
-| `#driver` | `8394:15054` | Applicant details from Singpass (locked), one "Additional driver" card per named driver chosen, vehicle details. Date of birth uses the purchase-flow picker: month and year grids from the header, no future dates. |
+| `#driver` | `8394:15054` | Applicant details from Singpass (locked), or empty and typed in for the manual flow (nothing prefilled, chassis number too; +65 stays fixed), one "Additional driver" card per named driver chosen, vehicle details. Date of birth uses the purchase-flow picker: month and year grids from the header, no future dates. |
 | `#review` | `8394:15430`, `8394:15715` | Everything entered so far, with Edit links back to Driver Details. **Confirm & Pay** works once the declaration is ticked. The 2C2P / Visa OTP screen in `8697:12426` is left out. |
 | `#confirmation` | `8600:17327` | Thank-you page with LottieFiles' free "Successful" animation (played once) in the success slot; its buttons and "here" have no destination in the design. |
 
@@ -52,7 +52,7 @@ date that no longer fits.
 ## Quote form rules
 - Progressive disclosure (8723:26351 … 8724:30894): **About your vehicle** (incl. NCD and off-peak) first; **About you**
   (main driver, drive at work, driving experience, claims) once NCD is chosen; **About your policy** (dates, with
-  "Total duration") once experience and claims are chosen. Check Price stays disabled until everything is filled.
+  "Total duration") once experience and claims are chosen. Check Price is always the primary button; pressed with fields still empty, it shows the design-system error state (Dropdown State=Error: red border, info icon and 12px message) on each visible empty field and scrolls to the first one. A section revealed afterwards starts without errors.
 - The start-date calendar opens on the current month; picking a start date fills the end date 365 days later, which
   can still be changed within 9 to 18 months.
 - "Are you the main driver?" (default Yes) comes before "Do you drive at work?", which is only asked (here, on Driver

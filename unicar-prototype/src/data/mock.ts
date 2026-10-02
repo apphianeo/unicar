@@ -191,3 +191,17 @@ export const singpassApplicant = {
   unit: "#09-124",
   chassis: "1HGCM82633A123456",
 };
+export type Applicant = typeof singpassApplicant;
+// Fill Manually (or after Clear Form): nothing is prefilled; +65 is the phone country code, not a personal detail.
+export const emptyApplicant: Applicant = {
+  name: "",
+  dob: "",
+  nric: "",
+  phoneCode: "+65",
+  phone: "",
+  email: "",
+  postalCode: "",
+  address: "",
+  unit: "",
+  chassis: "",
+};

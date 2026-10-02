@@ -5,6 +5,7 @@ import { defaultEndDate, emptyPolicy, type Policy } from "./components/PolicySec
 import {
   addOnCost,
   addOnCount,
+  emptyApplicant,
   excessOptions,
   addOns,
   plans,
@@ -15,6 +16,7 @@ import {
   promoRate,
   singpassVehicle,
   type PlanId,
+  type Applicant,
 } from "./data/mock";
 import AddOnsScreen, { type AddOnState } from "./screens/AddOns";
 import Confirmation from "./screens/Confirmation";
@@ -75,6 +77,8 @@ export default function App() {
   const [brandNew, setBrandNew] = useState<YesNo>("No");
   const [financing, setFinancing] = useState<YesNo>("No");
   const [agreed, setAgreed] = useState(false);
+  // Applicant details typed in on Driver Details when Singpass wasn't used.
+  const [manualApplicant, setManualApplicant] = useState<Applicant>(emptyApplicant);
 
   useEffect(() => {
     // Start at the landing page; a form page opened directly has no data to show.
@@ -95,6 +99,7 @@ export default function App() {
     setVehicle(emptyVehicle);
     setOffPeak("No");
     setPolicy(emptyPolicy);
+    setManualApplicant(emptyApplicant);
   };
 
   // Singpass fills the vehicle; otherwise it is what was keyed in (the frames show the Singpass car).
@@ -102,6 +107,8 @@ export default function App() {
   const regNo = (singpassFilled ? singpassVehicle.regNo : vehicle.regNo) || singpassVehicle.regNo;
   const period =
     policy.startDate && policy.endDate ? `${policy.startDate} - ${policy.endDate}` : "02/01/2026 - 01/01/2027";
+  // Singpass fills the applicant; in the manual flow it is what was typed on Driver Details.
+  const applicant = singpassFilled ? singpassApplicant : manualApplicant;
   const chosenPlan = plans.find((p) => p.id === plan)!;
   const picked = addOns.filter((a) => addOnState.selected.includes(a.id));
   // The plan's premium after the chosen policy excess (a higher excess lowers it), then the subtotal: that premium
@@ -215,7 +222,7 @@ export default function App() {
   }
 
   if (page === "review") {
-    const a = singpassApplicant;
+    const a = applicant;
     const dash = (v?: string) => v || "-";
     const power = singpassFilled ? singpassVehicle.power : (vehicle.make && powerByMake[vehicle.make]) || vehicle.power;
     const year = singpassFilled ? singpassVehicle.year : vehicle.year;
@@ -224,14 +231,14 @@ export default function App() {
         summary={summary}
         priceSummary={priceSummary("driver")}
         applicant={[
-          { label: "Full name as per NRIC/FIN", value: a.name },
-          { label: "Date of birth", value: a.dob },
-          { label: "NRIC/FIN", value: a.nric },
-          { label: "Mobile Number", value: `${a.phoneCode} ${a.phone}` },
-          { label: "Email address", value: a.email },
-          { label: "Postal code", value: a.postalCode },
-          { label: "Address", value: a.address },
-          { label: "Unit no.", value: a.unit },
+          { label: "Full name as per NRIC/FIN", value: dash(a.name) },
+          { label: "Date of birth", value: dash(a.dob) },
+          { label: "NRIC/FIN", value: dash(a.nric) },
+          { label: "Mobile Number", value: a.phone ? `${a.phoneCode} ${a.phone}` : "-" },
+          { label: "Email address", value: dash(a.email) },
+          { label: "Postal code", value: dash(a.postalCode) },
+          { label: "Address", value: dash(a.address) },
+          { label: "Unit no.", value: dash(a.unit) },
           { label: "Years of driving experience", value: dash(policy.experience) },
           { label: "Are you the main driver?", value: policy.mainDriver },
           ...(policy.mainDriver === "Yes" ? [{ label: "I drive at work", value: policy.driveAtWork }] : []),
@@ -247,7 +254,7 @@ export default function App() {
           { label: "Power Rating/Engine Capacity", value: dash(power) },
           { label: "Year of Registration", value: dash(year) },
           { label: "Off-peak Vehicle", value: offPeak },
-          { label: "Chassis number", value: a.chassis },
+          { label: "Chassis number", value: dash(a.chassis) },
           { label: "Brand new vehicle?", value: brandNew },
           { label: "Vehicle registration number", value: regNo },
           { label: "Is your car under financing?", value: financing },
@@ -280,6 +287,9 @@ export default function App() {
         priceSummary={priceSummary("driver")}
         make={make}
         regNo={regNo}
+        applicant={applicant}
+        fromSingpass={singpassFilled}
+        onApplicant={(d) => setManualApplicant((prev) => ({ ...prev, ...d }))}
         mainDriver={policy.mainDriver}
         driveAtWork={policy.driveAtWork}
         onDriveAtWork={(driveAtWork) => setPolicy((prev) => ({ ...prev, driveAtWork }))}

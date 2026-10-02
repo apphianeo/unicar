@@ -14,6 +14,20 @@ export type Policy = {
   driveAtWork: "Yes" | "No";
 };
 
+// Inline error messages, one per required field.
+export const errors = {
+  regNo: "Please enter your vehicle registration number",
+  make: "Please select your vehicle make and model",
+  power: "Please enter your vehicle's power rating/engine capacity",
+  year: "Please select your year of registration",
+  ncd: "Please select your no claims discount (NCD)",
+  experience: "Please select your years of driving experience",
+  claims: "Please select the number of claims made in the last 3 years",
+  startDate: "Please select your insurance start date",
+  endDate: "Please select your insurance end date",
+};
+export type ErrorKey = keyof typeof errors;
+
 export const emptyPolicy: Policy = { startDate: "", endDate: "", mainDriver: "Yes", driveAtWork: "No" };
 
 const addMonths = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
@@ -53,18 +67,19 @@ const sectionTitle = "whitespace-nowrap text-[18px] font-semibold leading-[1.5] 
 
 // "About you" and "About your policy" (8724:30894), revealed one at a time so the form doesn't overwhelm: About you
 // appears once NCD is chosen, About your policy once driving experience and claims are chosen. Then the promo and
-// Check Price, which stays disabled until every field is filled (8723:26351).
+// Check Price, a primary button throughout: pressed early, it shows inline errors on the empty fields (err).
 export function PolicySection({
   policy,
   onPolicy,
   showAboutYou,
-  canCheckPrice,
+  err,
   onCheckPrice,
 }: {
   policy: Policy;
   onPolicy: (p: Partial<Policy>) => void;
   showAboutYou: boolean;
-  canCheckPrice: boolean;
+  // Error message for a field if errors are showing and it is empty.
+  err: (key: ErrorKey, empty: boolean) => string | undefined;
   onCheckPrice: () => void;
 }) {
   const { min: endMin, max: endMax } = endDateRange(policy.startDate);
@@ -101,6 +116,7 @@ export function PolicySection({
               <Dropdown
                 label="Years of driving experience"
                 value={policy.experience}
+                error={err("experience", !policy.experience)}
                 options={experienceOptions}
                 onSelect={(experience) => onPolicy({ experience })}
               />
@@ -109,6 +125,7 @@ export function PolicySection({
                 info
                 tooltip={tooltips.claims}
                 value={policy.claims}
+                error={err("claims", !policy.claims)}
                 options={claimsOptions}
                 onSelect={(claims) => onPolicy({ claims })}
               />
@@ -125,6 +142,7 @@ export function PolicySection({
               <DateField
                 label="Insurance start date"
                 value={policy.startDate}
+                error={err("startDate", !parseDate(policy.startDate))}
                 initialMonth={today}
                 onChange={(startDate) => onPolicy({ startDate })}
               />
@@ -137,6 +155,7 @@ export function PolicySection({
                 minDate={endMin}
                 maxDate={endMax}
                 helper={durationText(policy.startDate, policy.endDate)}
+                error={err("endDate", !parseDate(policy.endDate))}
                 onChange={(endDate) => onPolicy({ endDate })}
               />
             </div>
@@ -148,7 +167,7 @@ export function PolicySection({
         <PromoField code={promoCode} />
         <TextButton icon={assets.icPlus}>Have an Agent ID?</TextButton>
       </div>
-      <Button variant="primary" disabled={!canCheckPrice} onClick={onCheckPrice}>
+      <Button variant="primary" onClick={onCheckPrice}>
         Check Price
       </Button>
     </>
