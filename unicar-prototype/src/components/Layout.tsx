@@ -38,7 +38,7 @@ export function LandingBanner() {
     <div className="flex w-full flex-col items-start gap-[16px]">
       <div className="flex items-center justify-center gap-[4px] rounded-[24px] bg-gradient-to-r from-[#005eb8] from-[0.618%] to-[#5c55eb] px-[8px] py-[4px]">
         <p className="whitespace-nowrap text-center text-[12px] font-medium leading-[1.4] text-white">
-          🎉 60% off auto-applied! | Promo ends 31 May
+          🎉 60% off auto-applied! | Promo ends 31 Dec
         </p>
       </div>
       <div className="flex w-full flex-col items-start gap-[12px]">
