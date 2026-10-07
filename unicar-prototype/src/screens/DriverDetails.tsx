@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { assets } from "../assets";
 import { FlowActions, FlowShell, PageTitle } from "../components/Flow";
 import { DateField, Dropdown, InputHeader, RadioGroup, TextField } from "../components/Form";
@@ -12,16 +12,29 @@ const lockedBox =
   "flex h-[48px] items-center gap-[8px] rounded-[8px] border border-solid border-line bg-disabled-bg px-[16px] py-[12px] field-disabled";
 const lockedText = "min-w-px flex-[1_0_0] text-[16px] font-normal leading-[1.5] text-text-disabled";
 
-// Driver details section card (8394:15060 …). The ic-up in the header has no collapsed state in the design, so it is inert.
+// Driver details section card (8394:15060 …). The chevron in the header collapses and expands the card; the design
+// has no collapsed state, so collapsed shows just the header with the same ic-up icon turned to point down.
 // Earlier cards sit above later ones (z), so an open calendar or menu floats over the cards below it.
 function Section({ title, z, children }: { title: string; z: number; children: ReactNode }) {
+  const [open, setOpen] = useState(true);
   return (
     <section style={{ zIndex: z }} className="relative flex w-full flex-col items-start gap-[24px] rounded-[12px] bg-bg-white p-[24px] drop-shadow-overlay">
-      <div className="flex w-full items-center justify-between">
-        <p className="whitespace-nowrap text-[20px] font-semibold leading-[1.2] text-text-primary">{title}</p>
-        <img src={assets.icUp24} alt="" width={24} height={24} className="size-[24px] shrink-0" />
-      </div>
-      <div className="flex w-full flex-col items-start gap-[24px]">{children}</div>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+        className="flex w-full cursor-pointer items-center justify-between text-left"
+      >
+        <span className="whitespace-nowrap text-[20px] font-semibold leading-[1.2] text-text-primary">{title}</span>
+        <img
+          src={assets.icUp24}
+          alt={open ? "Collapse" : "Expand"}
+          width={24}
+          height={24}
+          className={`size-[24px] shrink-0 transition-transform duration-200 ${open ? "" : "rotate-180"}`}
+        />
+      </button>
+      {open && <div className="flex w-full flex-col items-start gap-[24px]">{children}</div>}
     </section>
   );
 }
