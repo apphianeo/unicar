@@ -9,7 +9,7 @@ export type ExtraDriver = { name: string; dob: string; nric: string; experience?
 export const emptyExtraDriver: ExtraDriver = { name: "", dob: "", nric: "" };
 
 const lockedBox =
-  "flex h-[48px] items-center gap-[8px] rounded-[8px] border border-solid border-line bg-disabled-bg px-[16px] py-[12px]";
+  "flex h-[48px] items-center gap-[8px] rounded-[8px] border border-solid border-line bg-disabled-bg px-[16px] py-[12px] field-disabled";
 const lockedText = "min-w-px flex-[1_0_0] text-[16px] font-normal leading-[1.5] text-text-disabled";
 
 // Driver details section card (8394:15060 …). The ic-up in the header has no collapsed state in the design, so it is inert.

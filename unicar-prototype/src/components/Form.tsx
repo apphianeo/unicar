@@ -153,7 +153,7 @@ export function Dropdown({
 
   const text = disabled ? "text-text-disabled" : value ? "text-text-primary" : "text-text-tertiary";
   const look = disabled
-    ? "bg-disabled-bg"
+    ? "bg-disabled-bg field-disabled"
     : open
       ? `bg-bg-white ${openRing}`
       : "bg-bg-white";
@@ -251,7 +251,7 @@ export function TextField({
   return (
     <div className="flex min-w-px flex-[1_0_0] flex-col items-start gap-[12px]">
       {label && <InputHeader label={label} required={required} />}
-      <div className={`${fieldBox} ${disabled ? "bg-disabled-bg" : `bg-bg-white ${focusRing}`} ${error ? errorBorder : ""}`}>
+      <div className={`${fieldBox} ${disabled ? "bg-disabled-bg field-disabled" : `bg-bg-white ${focusRing}`} ${error ? errorBorder : ""}`}>
         <input
           value={value}
           disabled={disabled}

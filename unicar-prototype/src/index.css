@@ -37,6 +37,14 @@ html {
   overflow-y: scroll;
 }
 
+/* Anything disabled shows the not-allowed cursor, so it reads as locked rather than broken: every disabled control
+   (inputs, buttons, dropdowns, calendar days) is picked up automatically, plus locked field boxes marked .field-disabled. */
+:disabled,
+.field-disabled,
+.field-disabled * {
+  cursor: not-allowed !important;
+}
+
 html,
 body {
   font-family: "Noto Sans", sans-serif;
